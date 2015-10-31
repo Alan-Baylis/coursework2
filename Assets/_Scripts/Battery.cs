@@ -1,7 +1,3 @@
-﻿using UnityEngine;
-using System.Collections;
-
-public class Battery : AbstractElement
+﻿public class Battery : AbstractElement
 {
-
 }

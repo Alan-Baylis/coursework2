@@ -1,22 +1,10 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
+using UnityEngine;
 
 public class ElectricalCircuit : MonoBehaviour
 {
     protected List<AbstractElement> circuit;
-
-    public int IndexOfByName(string name)
-    {
-        return circuit.FindIndex(x => x.Name == name);
-    }
-
-    public T GetElementByName<T>(string name) where T : AbstractElement
-    {
-        return circuit.FirstOrDefault(x => x.Name == name) as T;
-    }
 
     public AbstractElement this[int i]
     {
@@ -28,5 +16,15 @@ public class ElectricalCircuit : MonoBehaviour
                 circuit[i] = value;
             }
         }
+    }
+
+    public int IndexOfByName(string name)
+    {
+        return circuit.FindIndex(x => x.Name == name);
+    }
+
+    public T GetElementByName<T>(string name) where T : AbstractElement
+    {
+        return circuit.FirstOrDefault(x => x.Name == name) as T;
     }
 }

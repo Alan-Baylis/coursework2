@@ -1,23 +1,16 @@
-﻿using UnityEngine;
-using System.Collections;
-
-public abstract class Cable : AbstractElement
+﻿public abstract class Cable : AbstractElement
 {
-    protected float length;
-    protected float resistivity;
-    protected float crossSectionalSquare;
-
     protected const float MinimalAcceptableCableLength = 0.1f;
     protected const float MinimalAcceptableCrossSectionalSquare = 0.1f;
     protected const float MinimalCrossSectionalSquare = 0;
     protected const float BoundCableLength = 0;
+    protected float crossSectionalSquare;
+    protected float length;
+    protected float resistivity;
 
     public virtual float Length
     {
-        get
-        {
-            return length;
-        }
+        get { return length; }
         set
         {
             length = length < BoundCableLength ? MinimalAcceptableCableLength : value;
@@ -27,13 +20,9 @@ public abstract class Cable : AbstractElement
 
     public virtual float Resistivity
     {
-        get
-        {
-            return resistivity;
-        }
+        get { return resistivity; }
         set
         {
-            // TODO logic
             resistivity = value;
             RecalculateResistance();
         }
@@ -41,31 +30,12 @@ public abstract class Cable : AbstractElement
 
     public virtual float CrossSectionalSquare
     {
-        get
-        {
-            return crossSectionalSquare;
-        }
+        get { return crossSectionalSquare; }
         set
         {
             crossSectionalSquare = value <= MinimalCrossSectionalSquare ? MinimalAcceptableCrossSectionalSquare : value;
             RecalculateResistance();
         }
-    }
-
-    public override double GetCurrent()
-    {
-        return base.GetCurrent();
-    }
-
-    public override double GetAmperage()
-    {
-        return base.GetAmperage();
-    }
-
-    protected override ElectricProperties Properties
-    {
-        get { return base.Properties; }
-        set { base.Properties = value; }
     }
 
     private void RecalculateResistance()

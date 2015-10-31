@@ -7,12 +7,6 @@ public abstract class AbstractElement : MonoBehaviour
 {
     public const string DefaultNameOfElement = "Element";
 
-	public string Name { get; set; }
-    protected virtual ElectricProperties Properties { get; set; }
-
-    public ElectricalCircuit AssociatedCircuit { get; set; }
-    public static List<string> Names { get; protected set; }
-
     protected AbstractElement(ElectricProperties props, string name = DefaultNameOfElement)
     {
         if (props == null)
@@ -23,17 +17,24 @@ public abstract class AbstractElement : MonoBehaviour
         Name = name;
     }
 
-    protected AbstractElement() : this(null) { }
+    protected AbstractElement() : this(null)
+    {
+    }
+
+    public string Name { get; set; }
+    protected virtual ElectricProperties Properties { get; set; }
+    public ElectricalCircuit AssociatedCircuit { get; set; }
+    public static List<string> Names { get; protected set; }
 
     public virtual double GetAmperage()
     {
         return Properties.Amperage;
     }
 
-	public virtual double GetCurrent()
-	{
-	    return Properties.Current;
-	}
+    public virtual double GetCurrent()
+    {
+        return Properties.Current;
+    }
 
     public virtual double GetResistance()
     {
