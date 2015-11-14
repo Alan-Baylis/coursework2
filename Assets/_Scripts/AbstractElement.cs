@@ -7,24 +7,40 @@ public abstract class AbstractElement : MonoBehaviour
 {
     public const string DefaultNameOfElement = "Element";
 
-    protected AbstractElement(ElectricProperties props, string name = DefaultNameOfElement)
+    protected AbstractElement(ElectricProperties props, string id = null)
     {
         if (props == null)
             props = ElectricProperties.CreateFromUR(0, 0);
         Properties = props;
-        name = NameRefinition(name);
-        Names.Add(name);
-        Name = name;
+        id = IdRefinition(id);
+        Id = id;
+        Ids.Add(id);
     }
 
     protected AbstractElement() : this(null)
     {
     }
 
-    public string Name { get; set; }
-    protected virtual ElectricProperties Properties { get; set; }
+    /// <summary>
+    ///     It is the unique identifier of element.
+    /// </summary>
+    public string Id { get; protected set; }
+
+    /// <summary>
+    ///     Name of the element.
+    /// </summary>
+    public virtual string Name
+    {
+        get { return DefaultNameOfElement; }
+    }
+
+    /// <summary>
+    ///     The electric properties of element.
+    /// </summary>
+    public ElectricProperties Properties { get; set; }
+
     public ElectricalCircuit AssociatedCircuit { get; set; }
-    public static List<string> Names { get; protected set; }
+    public static List<string> Ids { get; protected set; }
 
     public virtual double GetAmperage()
     {
@@ -51,22 +67,22 @@ public abstract class AbstractElement : MonoBehaviour
         return AssociatedCircuit[AssociatedCircuit.IndexOfByName(Name) + 1] as T;
     }
 
-    private static string NameRefinition(string name)
+    private static string IdRefinition(string id)
     {
-        if (!Names.Contains(name)) return name;
+        if (!Ids.Contains(id)) return id;
         var r = new Regex(@"\(\d+\)");
-        var m = r.Match(name);
+        var m = r.Match(id);
         if (m.Success)
         {
-            var succ = m.Groups[m.Groups.Count - 1].ToString();
-            var num = Convert.ToInt32(succ.Substring(1, succ.Length - 1));
-            name = name.Replace(succ, string.Format("({0})", num));
+            var oldValue = m.Groups[m.Groups.Count - 1].ToString();
+            var numberInParenthesis = Convert.ToInt32(oldValue.Substring(1, oldValue.Length - 1));
+            id = id.Replace(oldValue, string.Format("({0})", numberInParenthesis + 1));
         }
         else
         {
-            name += " (1)";
+            id += " (1)";
         }
 
-        return name;
+        return id;
     }
 }

@@ -1,11 +1,37 @@
 ﻿using System;
 
-public class ElectricProperties
+public class ElectricProperties : ICopyable<ElectricProperties>
 {
+    protected bool Equals(ElectricProperties other)
+    {
+        return Amperage.Equals(other.Amperage) && Current.Equals(other.Current) && Resistance.Equals(other.Resistance);
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (ReferenceEquals(null, obj)) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        return obj.GetType() == this.GetType() && Equals((ElectricProperties) obj);
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            var hashCode = Amperage.GetHashCode();
+            hashCode = (hashCode*397) ^ Current.GetHashCode();
+            hashCode = (hashCode*397) ^ Resistance.GetHashCode();
+            return hashCode;
+        }
+    }
+
+    public const double ToleranceOfEquality = 1e-5;
+
     protected ElectricProperties()
     {
     }
 
+    // I = U / R
     public virtual double Amperage { get; protected set; }
     public virtual double Current { get; protected set; }
     public virtual double Resistance { get; protected set; }
@@ -70,7 +96,7 @@ public class ElectricProperties
     /// <returns>resulting properties after connecting elements in series</returns>
     public static ElectricProperties operator &(ElectricProperties a, ElectricProperties b)
     {
-        a.SetIR(a.Amperage, a.Resistance + b.Resistance);
+        a.SetUR(a.Current, a.Resistance + b.Resistance);
         return a;
     }
 
@@ -82,7 +108,30 @@ public class ElectricProperties
     /// <returns>resulting properties after connecting elements in parrallel</returns>
     public static ElectricProperties operator |(ElectricProperties a, ElectricProperties b)
     {
-        a.SetIR(a.Amperage, 1/a.Resistance + 1/b.Resistance);
+        a.SetUR(a.Current, 1/a.Resistance + 1/b.Resistance);
         return a;
+    }
+
+    public ElectricProperties Copy()
+    {
+        return new ElectricProperties
+        {
+            Amperage = Amperage,
+            Current = Current,
+            Resistance = Resistance
+        };
+    }
+
+    public static bool operator ==(ElectricProperties a, ElectricProperties b)
+    {
+        if (a == null || b == null) return false;
+        return Math.Abs(a.Amperage - b.Amperage) < ToleranceOfEquality &&
+               Math.Abs(a.Current - b.Current) < ToleranceOfEquality &&
+               Math.Abs(a.Resistance - b.Resistance) < ToleranceOfEquality;
+    }
+
+    public static bool operator !=(ElectricProperties a, ElectricProperties b)
+    {
+        return !(a == b);
     }
 }
