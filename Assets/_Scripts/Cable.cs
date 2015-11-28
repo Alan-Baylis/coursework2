@@ -1,65 +1,87 @@
 ﻿public class Cable : AbstractElement, ICopyable<Cable>
 {
-    protected const string DefaultMaterialName = "copper";
-    protected const float MinimalAcceptableCableLength = 0.1f;
-    protected const float MinimalAcceptableCrossSectionalSquare = 0.1f;
-    protected const float MinimalCrossSectionalSquare = 0;
-    protected const float BoundCableLength = 0;
-    protected float crossSectionalSquare;
-    protected float length;
-    protected float resistivity;
+	#region Constants
+	protected const string DefaultMaterialName = "copper";
+	protected const float MinimalAcceptableCableLength = 1e-3f;
+	protected const float MinimalAcceptableCrossSectionalSquare = 1e-5f;
+	protected const float MinimalCrossSectionalSquare = 1e-3f;
+	protected const float BoundCableLength = 0;
+	#endregion
 
-    public virtual float Length
-    {
-        get { return length; }
-        set
-        {
-            length = length < BoundCableLength ? MinimalAcceptableCableLength : value;
-            RecalculateResistance();
-        }
-    }
+	protected float crossSectionalSquare;
+	protected float length;
+	protected float resistivity;
 
-    public virtual float Resistivity
-    {
-        get { return resistivity; }
-        set
-        {
-            resistivity = value;
-            RecalculateResistance();
-        }
-    }
+	public virtual float Length {
+		get { return length; }
+		set {
+			length = length < BoundCableLength ? MinimalAcceptableCableLength : value;
+			RecalculateResistance ();
+		}
+	}
 
-    public virtual float CrossSectionalSquare
-    {
-        get { return crossSectionalSquare; }
-        set
-        {
-            crossSectionalSquare = value <= MinimalCrossSectionalSquare ? MinimalAcceptableCrossSectionalSquare : value;
-            RecalculateResistance();
-        }
-    }
+	public virtual float Resistivity {
+		get { return resistivity; }
+		set {
+			resistivity = value;
+			RecalculateResistance ();
+		}
+	}
 
-    public Cable Copy()
-    {
-        return new Cable
+	public virtual float CrossSectionalSquare {
+		get { return crossSectionalSquare; }
+		set {
+			crossSectionalSquare = value <= 
+				MinimalCrossSectionalSquare ? MinimalAcceptableCrossSectionalSquare : value;
+			RecalculateResistance ();
+		}
+	}
+
+	public Cable Copy ()
+	{
+		return new Cable
         {
-            AssociatedCircuit = AssociatedCircuit,
             crossSectionalSquare = crossSectionalSquare,
             length = length,
             resistivity = resistivity,
             Properties = Properties.Copy()
         };
-    }
+	}
 
-    protected void RecalculateResistance()
-    {
-        Properties.SetUR(Properties.Current, resistivity*length/crossSectionalSquare);
-    }
+	protected void RecalculateResistance ()
+	{
+		Properties.SetUR (Properties.Current, resistivity * length / crossSectionalSquare);
+	}
 
-    public static readonly Cable DefaultCable = new Cable
+	public static readonly Cable DefaultCable = new Cable
     {
         CrossSectionalSquare = MinimalAcceptableCrossSectionalSquare,
         Length = MinimalAcceptableCableLength,
         Resistivity = HelperClass.GetResistivity(DefaultMaterialName)
     };
+
+    public Cable(ElectricProperties props=null) : base(props)
+    {
+
+    }
+
+	
+	#region implemented abstract members of NodeDrawableBase
+	
+	public override void Draw ()
+	{
+		throw new System.NotImplementedException ();
+	}
+	
+	#endregion
+	
+	#region implemented abstract members of NodeBase
+	
+	public override UnityEngine.Rect DragableRect {
+		get {
+			throw new System.NotImplementedException ();
+		}
+	}
+	
+	#endregion
 }
