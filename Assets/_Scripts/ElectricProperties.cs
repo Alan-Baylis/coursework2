@@ -6,7 +6,7 @@ public class ElectricProperties : ICopyable<ElectricProperties>
 	public const double LeastAmperage = 1e-6;
 	public const double LeastCurrent = 1e-6;
 
-	public bool IsConsideredPowered ()
+	public bool IsConsideredPowered () // todo rename
 	{
 		return Math.Abs (Amperage - LeastAmperage) < ToleranceOfEquality && Math.Abs (Current - LeastCurrent) < ToleranceOfEquality;
 	}

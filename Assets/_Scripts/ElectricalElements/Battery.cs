@@ -1,7 +1,16 @@
 ﻿public class Battery : AbstractElement
 {
-	#region implemented abstract members of NodeDrawableBase
-	public override void Draw ()
+    public Battery(ElectricProperties props) : base(props)
+    {
+    }
+
+    #region implemented abstract members of NodeDrawableBase
+
+    public Battery() : base (null)
+    {
+    }
+
+    public override void Draw ()
 	{
 		throw new System.NotImplementedException ();
 	}

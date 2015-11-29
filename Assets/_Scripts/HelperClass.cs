@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public static class HelperClass
@@ -19,5 +20,15 @@ public static class HelperClass
     public static void SetResistivity(string s, float newValue)
     {
         ResistivityTable[s] = newValue;
+    }
+
+    public static string GetReadableList<T>(this List<T> list)
+    {
+        var str = list.Aggregate("", (current, variable) => current + (variable.ToString() + ", "));
+
+        if (str.EndsWith(", "))
+            str = str.Substring(0, str.Length - 2);
+
+        return "[" + str + "]";
     }
 }

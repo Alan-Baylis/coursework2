@@ -28,6 +28,13 @@ public abstract class NodeBase: NodeDrawableBase
             joints[0] = value;
         }
     }
+
+    public NodeJointPoint this[int i]
+    {
+        get { return joints[i]; }
+        protected set { joints[i] = value; }
+    }
+
 	#region Constructors and destructors
 
 	protected NodeBase ()
@@ -170,25 +177,26 @@ public abstract class NodeBase: NodeDrawableBase
     /// The offset of first child's joint.
     /// </summary>
     public Vector2 FirstJointOffset { get { return joints[0].Offset; } set { joints[0].Offset = value; } }
-    #endregion
     #region Children CRUD
 
-    public virtual void AddChild (NodeChildBase node)
-	{
-		if (node == null)
-			return;
-		node.Parent = this;
-		Children.Add (node);
-	}
+    public virtual void AddChild(NodeChildBase node)
+    {
+        if (node == null)
+            return;
+        node.Parent = this;
+        Children.Add(node);
+    }
 
-	public virtual void RemoveChild (NodeChildBase node)
-	{
-		if (Children.Remove (node)) {
-			node.Parent = null;
-		}
-	}
+    public virtual void RemoveChild(NodeChildBase node)
+    {
+        if (Children.Remove(node))
+        {
+            node.Parent = null;
+        }
+    }
 
-	#endregion
+    #endregion
+    #endregion
 	public override string ToString ()
 	{
 		return string.Format ("ID: {0}, Position:{1}, Size:{2}, FirstJointRect: {3}, FirstJointOffset: {4}.",
@@ -196,7 +204,7 @@ public abstract class NodeBase: NodeDrawableBase
 	}
 	public virtual void Connect<T> (T nb) where T: NodeBase
 	{
-        if (nb is NodeBase)
+        if (nb != null)
         {
             var baseInstance = (NodeBase)nb;
             var newNodeJointPoint = new NodeJointPoint(this);
@@ -205,7 +213,7 @@ public abstract class NodeBase: NodeDrawableBase
         }
         else
         {
-            Debug.LogError("error trying to connect NodeBase to not NodeBase");
+            Debug.LogError("error trying to connect NodeBase to null");
         }
 	}
 }
