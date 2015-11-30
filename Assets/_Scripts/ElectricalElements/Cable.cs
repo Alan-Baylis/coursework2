@@ -2,17 +2,18 @@
 {
 	#region Constants
 	protected const string DefaultMaterialName = "copper";
-	protected const float MinimalAcceptableCableLength = 1e-3f;
-	protected const float MinimalAcceptableCrossSectionalSquare = 1e-5f;
-	protected const float MinimalCrossSectionalSquare = 1e-3f;
-	protected const float BoundCableLength = 0;
+    protected const double MinimalAcceptableCableLength = 1e-3;
+    protected const double MinimalAcceptableCrossSectionalSquare = 1e-5;
+    protected const double MinimalCrossSectionalSquare = 1e-3;
+    protected const double BoundCableLength = 0;
 	#endregion
 
-	protected float crossSectionalSquare;
-	protected float length;
-	protected float resistivity;
+    protected double crossSectionalSquare;
+    protected double length;
+	protected double resistivity;
 
-	public virtual float Length {
+    public virtual double Length
+    {
 		get { return length; }
 		set {
 			length = length < BoundCableLength ? MinimalAcceptableCableLength : value;
@@ -20,7 +21,8 @@
 		}
 	}
 
-	public virtual float Resistivity {
+    public virtual double Resistivity
+    {
 		get { return resistivity; }
 		set {
 			resistivity = value;
@@ -28,7 +30,8 @@
 		}
 	}
 
-	public virtual float CrossSectionalSquare {
+    public virtual double CrossSectionalSquare
+    {
 		get { return crossSectionalSquare; }
 		set {
 			crossSectionalSquare = value <= 
@@ -50,7 +53,7 @@
 
 	protected void RecalculateResistance ()
 	{
-		Properties.SetUR (Properties.Current, resistivity * length / crossSectionalSquare);
+		Properties.SetIR (Properties.Amperage, resistivity * length / crossSectionalSquare);
 	}
 
 	public static readonly Cable DefaultCable = new Cable
@@ -62,7 +65,10 @@
 
     public Cable(ElectricProperties props=null) : base(props)
     {
-
+        var resistance = props.Resistance;
+        Resistivity = HelperClass.GetResistivity(DefaultMaterialName);
+        CrossSectionalSquare = 1;
+        Length = resistance * CrossSectionalSquare / Resistivity;
     }
 
     /*public override void GiveProperties(ElectricProperties properties, AbstractElement beginning)

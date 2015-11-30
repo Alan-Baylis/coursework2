@@ -32,6 +32,8 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
     #endregion
     public bool Powered { get { return Properties.IsConsideredPowered (); } }
 
+    public virtual bool Conductive { get { return NextElements.Count == 0; } }
+
     public List<AbstractElement> NextElements
     {
         get
@@ -74,17 +76,17 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
             //Debug.Log("Assigning resList");
             resList = new List<AbstractElement>();
         }
-        //Debug.Log(string.Format("Adding our element, {0} with id {1}", GetType(), Id));
+        Debug.Log(string.Format("Adding our element, {0}", Name));
         resList.Add(this);
         if (this == begin) // if we reached the element from which we started, the list is complete
         {
             //Debug.Log(string.Format("END, returning resList with length {0} and elements {1}", resList.Count, resList.GetReadableList()));
             return resList;
         }
-        if (NextElements.Count == 0)
+        if (!Conductive)
         {
             // [reslist assigned, this is not beginning element, have no joints]
-            //Debug.Log(string.Format("!!! Returning null, no joints in {0}({1}) object", GetType(), Id));
+            Debug.Log(string.Format("!!! Returning null, no joints in {0} object", Name));
             resList.Remove(this);
             return null;
         }
@@ -128,7 +130,7 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
 	///     Name of the element.
 	/// </summary>
 	public virtual string Name {
-		get { return DefaultNameOfElement; }
+        get { return string.Format("{0}({1})", GetType().ToString(), Id); } // string.Format("{0}({1})", GetType().ToString(), Id)
 	}
 
 	#region Electric properties

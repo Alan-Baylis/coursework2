@@ -1,12 +1,30 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 public class Key : AbstractElement {
-    public Key(ElectricProperties electricProperties=null) : base(electricProperties)
+    public bool On { get; set; }
+
+    public virtual void Switch()
     {
-        
+        On = !On;
     }
 
+    public Key(ElectricProperties electricProperties=null) : base(electricProperties)
+    {
+        On = false;
+    }
+
+    public override bool Conductive
+    {
+        get
+        {
+            return base.Conductive || On;
+        }
+    }
+
+    #region Deprecated
     public override void Draw()
     {
         throw new System.NotImplementedException();
@@ -16,4 +34,5 @@ public class Key : AbstractElement {
     {
         get { throw new System.NotImplementedException(); }
     }
+    #endregion
 }

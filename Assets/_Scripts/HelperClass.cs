@@ -4,20 +4,20 @@ using UnityEngine;
 
 public static class HelperClass
 {
-    private static readonly Dictionary<string, float> ResistivityTable = new Dictionary<string, float>()
+    private static readonly Dictionary<string, double> ResistivityTable = new Dictionary<string, double>()
     {
-        {"copper", 1.68e-8f},
-        {"silver", 1.59e-8f},
-        {"aluminium", 2.65e-8f},
-        {"graphene", 1e-8f}
+        {"copper", 1.68e-8},
+        {"silver", 1.59e-8},
+        {"aluminium", 2.65e-8},
+        {"graphene", 1e-8}
     };
 
-    public static float GetResistivity(string s)
+    public static double GetResistivity(string s)
     {
         return ResistivityTable[s];
     }
 
-    public static void SetResistivity(string s, float newValue)
+    public static void SetResistivity(string s, double newValue)
     {
         ResistivityTable[s] = newValue;
     }
