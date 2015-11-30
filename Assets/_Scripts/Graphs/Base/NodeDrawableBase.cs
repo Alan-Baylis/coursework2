@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-public abstract class NodeDrawableBase : ScriptableObject
+public abstract class NodeDrawableBase
 {
 	/// <summary>
 	/// All drawables.

@@ -11,16 +11,16 @@ public class Key : AbstractElement {
         On = !On;
     }
 
-    public Key(ElectricProperties electricProperties=null) : base(electricProperties)
+    public Key(bool state=false, ElectricProperties electricProperties=null) : base(electricProperties)
     {
-        On = false;
+        On = state;
     }
 
     public override bool Conductive
     {
         get
         {
-            return base.Conductive || On;
+            return base.Conductive && On;
         }
     }
 

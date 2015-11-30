@@ -63,7 +63,7 @@
         Resistivity = HelperClass.GetResistivity(DefaultMaterialName)
     };
 
-    public Cable(ElectricProperties props=null) : base(props)
+    public Cable(ElectricProperties props) : base(props)
     {
         var resistance = props.Resistance;
         Resistivity = HelperClass.GetResistivity(DefaultMaterialName);
@@ -71,15 +71,8 @@
         Length = resistance * CrossSectionalSquare / Resistivity;
     }
 
-    /*public override void GiveProperties(ElectricProperties properties, AbstractElement beginning)
-    {
-        if (beginning == null)
-            beginning = this;
-        else if (beginning == this)
-            return;
-        Properties = properties;
-        NextElement.GiveProperties(properties, beginning);
-    }*/
+    public Cable() : base(null)
+    { }
 
     #region implemented abstract members of NodeDrawableBase
 	

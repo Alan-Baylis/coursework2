@@ -4,19 +4,8 @@ using System;
 [TestFixture]
 public class AbstractElementUnitTest
 {
-    /// <summary>
-    /// Connects element from list to another element from that list.
-    /// </summary>
-    /// <param name="all">list</param>
-    /// <param name="ind1">index of element which you connect</param>
-    /// <param name="ind2">index of element to which you connect</param>
-    void Join(List<AbstractElement> all, int ind1, int ind2)
-    {
-        all[ind1].Connect(all[ind2]);
-    }
-
 	[Test]
-	public void Action1 ()
+	public void ConnectingClosedCircuitWith2Elements ()
 	{
         /*
          * (0)---(1)
@@ -55,52 +44,61 @@ public class AbstractElementUnitTest
     public void ConnectingBigCircuitWithLotsOfBranches()
     {
         /*
-         *     _(0)----(1)
-         *    /  |      |
-         *   (5) |      |
-         *    \  |      |
-         *     -(4)----(2)
+         *     .(0)----(1)---(8).
+         *    /  |      |\      |
+         *   (5) |      | --(9) |
+         *    \  |      |     \ |
+         *     -(4)----(2)----(10)
          *      /        \
          *     /          \
-         *   (6)          (3)
+         *   (6)---(7)    (3)
          */
         var random = new Random();
         var elementsList = new List<AbstractElement>
         {
-            new Battery(ElectricProperties.CreateFromUR(random.Next(10, 20), random.Next(1, 3))),
-            new Cable(ElectricProperties.CreateFromUR(0, random.Next(1, 15))),
-            new Cable(ElectricProperties.CreateFromUR(0, random.Next(1, 15))),
-            new Cable(ElectricProperties.CreateFromUR(0, random.Next(1, 15))),
-            new Cable(ElectricProperties.CreateFromUR(0, random.Next(1, 15))),
-            new Cable(ElectricProperties.CreateFromUR(0, random.Next(1, 15))),
-            new Cable(ElectricProperties.CreateFromUR(0, random.Next(1, 15)))
+            HelperClass.GetRandomBattery(random),
+            HelperClass.GetRandomCable(random),
+            HelperClass.GetRandomCable(random),
+            HelperClass.GetRandomCable(random),
+            HelperClass.GetRandomCable(random),
+            HelperClass.GetRandomCable(random),
+            HelperClass.GetRandomCable(random),
+            HelperClass.GetRandomCable(random),
+            HelperClass.GetRandomCable(random),
+            HelperClass.GetRandomCable(random),
+            HelperClass.GetRandomCable(random),
         };
-        const int batteryIndex = 0;
-        const int el1Index = 1;
-        const int el2Index = 2;
-        const int el3Index = 3;
-        const int el4Index = 4;
-        const int el5Index = 5;
-        const int el6Index = 6;
 
-        Join(elementsList, batteryIndex, el1Index);
-        Join(elementsList, el1Index, el2Index);
-        Join(elementsList, el2Index, el3Index);
-        Join(elementsList, el2Index, el4Index);
-        Join(elementsList, el4Index, el5Index);
-        Join(elementsList, el4Index, batteryIndex);
-        Join(elementsList, el4Index, el6Index);
-        Join(elementsList, el5Index, batteryIndex);
+        HelperClass.Join(elementsList, 0, 1);
+        HelperClass.Join(elementsList, 1, 2);
+        HelperClass.Join(elementsList, 1, 8);
+        HelperClass.Join(elementsList, 1, 9);
+        HelperClass.Join(elementsList, 2, 3);
+        HelperClass.Join(elementsList, 2, 4);
+        HelperClass.Join(elementsList, 4, 5);
+        HelperClass.Join(elementsList, 4, 0);
+        HelperClass.Join(elementsList, 4, 6);
+        HelperClass.Join(elementsList, 4, 7);
+        HelperClass.Join(elementsList, 5, 0);
+        HelperClass.Join(elementsList, 8, 10);
+        HelperClass.Join(elementsList, 9, 10);
+        HelperClass.Join(elementsList, 10, 2);
 
-        elementsList[batteryIndex].GiveProperties();
+        elementsList[0].GiveProperties();
 
-        for (var i = 1; i < 6; ++i)
+        for (var i = 1; i < elementsList.Count; ++i)
         {
-            if (i == el3Index || i == el6Index) continue;
-            Assert.AreNotEqual(elementsList[i].Properties.Amperage, elementsList[el3Index].Properties.Amperage,
+            if (i == 3 || i == 6 || i == 7) continue;
+            Assert.AreNotEqual(elementsList[i].Properties.Amperage, elementsList[3].Properties.Amperage,
                 string.Format("index = {0}, element = {1}", i, elementsList[i].Name));
-            Assert.AreNotEqual(elementsList[i].Properties.Amperage, elementsList[el6Index].Properties.Amperage,
+            Assert.AreNotEqual(elementsList[i].Properties.Amperage, elementsList[6].Properties.Amperage,
+                string.Format("index = {0}, element = {1}", i, elementsList[i].Name));
+            Assert.AreNotEqual(elementsList[i].Properties.Amperage, elementsList[7].Properties.Amperage,
                 string.Format("index = {0}, element = {1}", i, elementsList[i].Name));
         }
+        Assert.AreEqual(elementsList[1].Properties.Amperage, elementsList[8].Properties.Amperage,
+            string.Format("element = {0}", elementsList[8].Name));
+        Assert.AreEqual(elementsList[1].Properties.Amperage, elementsList[9].Properties.Amperage,
+            string.Format("element = {0}", elementsList[9].Name));
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
 {
@@ -13,7 +12,7 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
 			return FirstJoint.Target.Parent as AbstractElement;
 		}
 		protected set {
-            FirstJoint.Connect(value);// ? new NodeJointPoint (value)
+            FirstJoint.Connect(value);
 		}
 	}
     #region Constructors & destructors
@@ -32,7 +31,7 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
     #endregion
     public bool Powered { get { return Properties.IsConsideredPowered (); } }
 
-    public virtual bool Conductive { get { return NextElements.Count == 0; } }
+    public virtual bool Conductive { get { return NextElements.Count != 0; } }
 
     public List<AbstractElement> NextElements
     {
@@ -76,7 +75,7 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
             //Debug.Log("Assigning resList");
             resList = new List<AbstractElement>();
         }
-        Debug.Log(string.Format("Adding our element, {0}", Name));
+        //Debug.Log(string.Format("Adding our element, {0}", Name));
         resList.Add(this);
         if (this == begin) // if we reached the element from which we started, the list is complete
         {
@@ -86,7 +85,7 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
         if (!Conductive)
         {
             // [reslist assigned, this is not beginning element, have no joints]
-            Debug.Log(string.Format("!!! Returning null, no joints in {0} object", Name));
+            //Debug.Log(string.Format("!!! Returning null, no joints in {0} object", Name));
             resList.Remove(this);
             return null;
         }
@@ -130,7 +129,7 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
 	///     Name of the element.
 	/// </summary>
 	public virtual string Name {
-        get { return string.Format("{0}({1})", GetType().ToString(), Id); } // string.Format("{0}({1})", GetType().ToString(), Id)
+        get { return string.Format("{0}({1})", GetType(), Id); } // string.Format("{0}({1})", GetType().ToString(), Id)
 	}
 
 	#region Electric properties

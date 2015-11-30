@@ -112,11 +112,10 @@ public class NodeJointPoint
 			TargetId = NodeDrawableBase.NothingId;
 			Target = null;
             return false;
-		} else {
-			TargetId = target.Id;
-			Target = target.FirstJoint;
-			return true;
 		}
+        TargetId = target.Id;
+        Target = target.FirstJoint;
+        return true;
 	}
 
 	/// <summary>
