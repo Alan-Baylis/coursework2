@@ -44,7 +44,7 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
         get { return string.Format("{0}({1})", GetType(), Id); } // string.Format("{0}({1})", GetType().ToString(), Id)
     }
 
-    public void Connect(AbstractElement other)
+    public virtual void Connect(AbstractElement other)
     {
         if (NextElement == null)
         {
@@ -53,6 +53,11 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
         else
         {
             joints.Add(new NodeJointPoint(this, other));
+        }
+        var point = other as ConcentrationPoint;
+        if (point != null)
+        {
+            point.InBranchesNum++;
         }
     }
 
@@ -121,9 +126,14 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
         return totalResList;
     }
 
-    public void Disconnect(AbstractElement other)
+    public virtual void Disconnect(AbstractElement other)
     {
         joints.RemoveAll(x => x.Connected(other));
+        var point = other as ConcentrationPoint;
+        if (point != null)
+        {
+            point.InBranchesNum--;
+        }
     }
 
     protected double GetFullCircuitResistance(AbstractElement beginning, double sum = 0)
@@ -185,22 +195,7 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
     /// <summary>
     ///     The electric properties of element.
     /// </summary>
-    public ElectricProperties Properties { get; set; }
-
-    public virtual double GetAmperage()
-    {
-        return Properties.Amperage;
-    }
-
-    public virtual double GetCurrent()
-    {
-        return Properties.Current;
-    }
-
-    public virtual double GetResistance()
-    {
-        return Properties.Resistance;
-    }
+    public virtual ElectricProperties Properties { get; protected set; }
 
     #endregion
 }
