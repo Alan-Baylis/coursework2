@@ -4,14 +4,15 @@ using System;
 [TestFixture]
 public class AbstractElementUnitTest
 {
-	[Test]
+    readonly Random random = new Random();
+    [Test]
 	public void ConnectingClosedCircuitWith2Elements ()
 	{
         /*
          * (0)---(1)
          *   \___/
          */
-		var cable = new Cable(ElectricProperties.CreateFromUR(0, 10));
+		var cable = HelperClass.GetRandomCable(random);
         var battery = new Battery(ElectricProperties.CreateFromUR(5, 2));
 
         cable.Connect(battery);
@@ -28,9 +29,9 @@ public class AbstractElementUnitTest
          * (0)--(1)--(2)
          *   \_______/
          */
-        var cable1 = new Cable(ElectricProperties.CreateFromUR(0, 10));
+        var cable1 = HelperClass.GetRandomCable(random);
         var battery = new Battery(ElectricProperties.CreateFromUR(2, 10));
-        var cable2 = new Cable(ElectricProperties.CreateFromUR(3, 10));
+        var cable2 = HelperClass.GetRandomCable(random);
         cable2.Properties.SetUR(2, 3);
 
         cable1.Connect(battery);
@@ -53,7 +54,6 @@ public class AbstractElementUnitTest
          *     /          \
          *   (6)---(7)    (3)
          */
-        var random = new Random();
         var elementsList = new List<AbstractElement>
         {
             HelperClass.GetRandomBattery(random),

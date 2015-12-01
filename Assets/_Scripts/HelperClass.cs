@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 public static class HelperClass
 {
@@ -47,11 +48,31 @@ public static class HelperClass
 
     public static Cable GetRandomCable(Random random)
     {
-        return new Cable(ElectricProperties.CreateFromUR(0, random.Next(1, 15)));
+        return new Cable("copper", random.Next(1, 5), random.Next(1, 10));
     }
 
     public static Battery GetRandomBattery(Random random)
     {
         return new Battery(ElectricProperties.CreateFromUR(random.Next(10, 20), random.Next(1, 3)));
+    }
+
+    public static string IdRefinition(string id, List<string> ids)
+    {
+        if (!ids.Contains(id))
+            return id;
+        var r = new Regex(@"\(\d+\)");
+        var m = r.Match(id);
+        if (m.Success)
+        {
+            var oldValue = m.Groups[m.Groups.Count - 1].ToString();
+            var numberInParenthesis = Convert.ToInt32(oldValue.Substring(1, oldValue.Length - 1));
+            id = id.Replace(oldValue, string.Format("({0})", numberInParenthesis + 1));
+        }
+        else
+        {
+            id += " (1)";
+        }
+
+        return id;
     }
 }
