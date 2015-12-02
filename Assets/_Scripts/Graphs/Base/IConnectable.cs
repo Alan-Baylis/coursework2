@@ -2,5 +2,5 @@
 using System.Collections;
 
 public interface IConnectable<T> {
-    void Connect(T other);
+    bool Connect(T other);
 }

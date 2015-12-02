@@ -108,14 +108,18 @@ public class NodeJointPoint
 	/// </summary>
 	public bool Connect (NodeBase target)
 	{
-		if (target == null) {
+		/*if (target == null) {
 			TargetId = NodeDrawableBase.NothingId;
 			Target = null;
             return false;
 		}
         TargetId = target.Id;
         Target = target.FirstJoint;
-        return true;
+        return true;*/
+
+        TargetId = target == null ? NodeDrawableBase.NothingId : target.Id;
+        Target = target == null ? null : target.FirstJoint;
+        return target == null;
 	}
 
 	/// <summary>

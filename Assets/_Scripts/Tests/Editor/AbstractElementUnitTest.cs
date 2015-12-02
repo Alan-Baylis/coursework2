@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
 using System;
+using UnityEngine;
 [TestFixture]
 public class AbstractElementUnitTest
 {
-    readonly Random random = new Random();
+    readonly System.Random random = new System.Random();
     [Test]
 	public void ConnectingClosedCircuitWith2Elements ()
 	{
@@ -41,19 +42,21 @@ public class AbstractElementUnitTest
         Assert.AreEqual(battery.Properties.Amperage, cable1.Properties.Amperage);
     }
 
-    [Test]
+
+    /*
+     *     .(0)----(1)---(8).
+     *    /  |      |\      |
+     *   (5) |      | --(9) |
+     *    \  |      |     \ |
+     *     -(4)----(2)----(10)
+     *      /        \
+     *     /          \
+     *   (6)---(7)    (3)
+     *
+     */
+    /*[Test]
     public void ConnectingBigCircuitWithLotsOfBranches()
     {
-        /*
-         *     .(0)----(1)---(8).
-         *    /  |      |\      |
-         *   (5) |      | --(9) |
-         *    \  |      |     \ |
-         *     -(4)----(2)----(10)
-         *      /        \
-         *     /          \
-         *   (6)---(7)    (3)
-         */
         var elementsList = new List<AbstractElement>
         {
             HelperClass.GetRandomBattery(random),
@@ -100,5 +103,44 @@ public class AbstractElementUnitTest
             string.Format("element = {0}", elementsList[8].Name));
         Assert.AreEqual(elementsList[1].Properties.Amperage, elementsList[9].Properties.Amperage,
             string.Format("element = {0}", elementsList[9].Name));
+    }*/
+
+    [Test]
+    public void BranchResistanceTest()
+    {
+        /*
+         *          (0)<---^
+         *          / \    |
+         * Branch[(1) (2)  |
+         *          \ /    |
+         *          (3)---->
+         */
+
+        var battery = new Battery(ElectricProperties.CreateFromUR(30, 1));
+        var branch = new BranchingElement();
+        var el1 = new Cable("test_one", 10, 1);
+        Debug.Log(string.Format("created element1: {0}", el1));
+        var el2 = new Cable("test_one", 10, 1);
+        Debug.Log(string.Format("created element2: {0}", el2));
+        var el3 = new Cable("test_one", 10, 1);
+        Debug.Log(string.Format("created element3: {0}", el3));
+        branch.Branches.Add(el1);
+        branch.Branches.Add(el2);
+
+        battery.Connect(branch);
+        branch.Branches[0].Connect(el3);
+        branch.Connect(battery);
+        el3.Connect(BranchEndElement.BranchEnd);
+        el1.Connect(BranchEndElement.BranchEnd);
+
+        branch.CloseBranches();
+
+        battery.GiveProperties();
+
+        var el1Res = el1.Properties.Resistance;
+        var el2Res = el2.Properties.Resistance;
+        var el3Res = el3.Properties.Resistance;
+
+        Assert.AreEqual(HelperClass.GetParallelResistance((new List<double> { el1Res + el3Res, el2Res })), branch.Properties.Resistance);
     }
 }

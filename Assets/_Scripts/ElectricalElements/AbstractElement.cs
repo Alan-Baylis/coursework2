@@ -11,7 +11,7 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
         {
             if (FirstJoint.Target == null || FirstJoint.Target.Parent == null)
                 return null;
-            return FirstJoint.Target.Parent as AbstractElement;
+            return (AbstractElement)(FirstJoint.Target.Parent);
         }
         protected set { FirstJoint.Connect(value); }
     }
@@ -20,7 +20,7 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
     {
         get { return Properties.IsConsideredPowered(); }
     }
-
+    
     public virtual bool Conductive
     {
         get { return NextElements.Count != 0; }
@@ -44,21 +44,16 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
         get { return string.Format("{0}({1})", GetType(), Id); } // string.Format("{0}({1})", GetType().ToString(), Id)
     }
 
-    public virtual void Connect(AbstractElement other)
+    public virtual bool Connect(AbstractElement other)
     {
-        if (NextElement == null)
-        {
-            NextElement = other;
-        }
-        else
+        /*if (NextElement == null)
+        {*/
+            return (NextElement = other) != null;
+        //}
+        /*else
         {
             joints.Add(new NodeJointPoint(this, other));
-        }
-        var point = other as ConcentrationPoint;
-        if (point != null)
-        {
-            point.InBranchesNum++;
-        }
+        }*/
     }
 
     public virtual void GiveProperties()
@@ -72,21 +67,14 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
         //Debug.Log(string.Format("Connected elements: {0}", listOfConnectedElements.GetReadableList()));
         var batteries = listOfConnectedElements.OfType<Battery>();
         var batteryU = 0.0;
-        var batteryR = 0.0;
 
-        foreach (var battery in batteries)
-        {
-            batteryR += battery.Properties.Resistance;
-            batteryU += battery.Properties.Current;
-        }
+        batteryU = (from battery in batteries select battery.Properties.Current).ToList<double>().Sum();
 
-        var circuitR =
-            listOfConnectedElements.Where(connectedElement => !(connectedElement is Battery))
-                .Sum(connectedElement => connectedElement.Properties.Resistance);
+        var circuitR = (from element in listOfConnectedElements select element.Properties.Resistance).ToList<double>().Sum();
 
         foreach (var connectedElement in listOfConnectedElements)
         {
-            connectedElement.Properties.SetIR(batteryU/(batteryR + circuitR), connectedElement.Properties.Resistance);
+            connectedElement.Properties.SetIR(batteryU / circuitR, connectedElement.Properties.Resistance);
         }
     }
 
@@ -129,21 +117,6 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
     public virtual void Disconnect(AbstractElement other)
     {
         joints.RemoveAll(x => x.Connected(other));
-        var point = other as ConcentrationPoint;
-        if (point != null)
-        {
-            point.InBranchesNum--;
-        }
-    }
-
-    protected double GetFullCircuitResistance(AbstractElement beginning, double sum = 0)
-    {
-        if (beginning == this) return 0;
-        if (NextElement != null)
-        {
-            return NextElement.GetFullCircuitResistance(beginning, sum + Properties.Resistance);
-        }
-        return sum + Properties.Resistance;
     }
 
     public virtual bool IsClosed()
@@ -168,19 +141,30 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
         return string.Format("{0}({1})", GetType(), Id);
     }
 
+    public double GetSeriesResistance(List<AbstractElement> elements)
+    {
+        //return elements.Sum<AbstractElement>(x => x.Properties.Resistance);
+        return (from element in elements select element.Properties.Resistance).ToList<double>().Sum();
+    }
+
+    public double GetSeriesResistance(List<double> numbers)
+    {
+        return numbers.Sum();
+    }
+
     #region Constructors & destructors
 
     protected AbstractElement(ElectricProperties props)
     {
         if (props == null)
             props = ElectricProperties.CreateFromUR(0, 1);
-        Properties = props;
+        properties = props;
         joints.Add(new NodeJointPoint(this));
     }
 
     protected AbstractElement(double resistance)
     {
-        Properties = ElectricProperties.CreateFromUR(0, resistance);
+        properties = ElectricProperties.CreateFromUR(0, resistance);
         joints.Add(new NodeJointPoint(this));
     }
 
@@ -195,7 +179,23 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
     /// <summary>
     ///     The electric properties of element.
     /// </summary>
-    public virtual ElectricProperties Properties { get; protected set; }
+    public virtual ElectricProperties Properties
+    {
+        get
+        {
+            return properties;
+        }
+        protected set
+        {
+            properties = value;
+        }
+    }
+    private ElectricProperties properties;
+
+    public virtual void SetCurrent(double current)
+    {
+        properties.SetUR(current, properties.Resistance);
+    }
 
     #endregion
 }

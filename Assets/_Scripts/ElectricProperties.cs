@@ -49,7 +49,7 @@ public class ElectricProperties : ICopyable<ElectricProperties>
 	public static ElectricProperties CreateFromIU (double amperage, double current)
 	{
 		var r = new ElectricProperties {Amperage = amperage, Current = current};
-		r.Resistance = r.Current / r.Amperage;
+        r.Resistance = (r.Amperage == 0) ? double.PositiveInfinity : r.Current / r.Amperage;
 		return r;
 	}
 
@@ -65,7 +65,7 @@ public class ElectricProperties : ICopyable<ElectricProperties>
 	public static ElectricProperties CreateFromUR (double current, double resistance)
 	{
 		var r = new ElectricProperties {Current = current, Resistance = resistance};
-		r.Amperage = r.Current / r.Resistance;
+        r.Amperage = r.Resistance == 0 ? double.PositiveInfinity : r.Current / r.Resistance;
 		return r;
 	}
 
@@ -75,7 +75,7 @@ public class ElectricProperties : ICopyable<ElectricProperties>
 	{
 		Amperage = amperage;
 		Current = current;
-		Resistance = Current / Amperage;
+        Resistance = Amperage == 0 ? double.PositiveInfinity : Current / Amperage;
 	}
 
 	// ReSharper disable once InconsistentNaming
@@ -90,12 +90,12 @@ public class ElectricProperties : ICopyable<ElectricProperties>
 	{
 		Current = current;
 		Resistance = resistance;
-		Amperage = Current / Resistance;
+        Amperage = Resistance == 0 ? double.PositiveInfinity : Current / Resistance;
 	}
 
 	public static bool ArePropertiesValid (ElectricProperties ep, double tolerance = 1e-13)
 	{
-		return Math.Abs (ep.Amperage - ep.Current / ep.Resistance) < tolerance;
+        return !(new List<double> { ep.Amperage, ep.Current, ep.Resistance }.Contains(double.PositiveInfinity)) && Math.Abs(ep.Amperage - ep.Current / ep.Resistance) < tolerance;
 	}
 
 	/// <summary>

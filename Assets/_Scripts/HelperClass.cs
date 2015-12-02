@@ -11,7 +11,8 @@ public static class HelperClass
         {"copper", 1.68e-8},
         {"silver", 1.59e-8},
         {"aluminium", 2.65e-8},
-        {"graphene", 1e-8}
+        {"graphene", 1e-8},
+        {"test_one", 1.0}
     };
 
     public static double GetResistivity(string s)
@@ -74,5 +75,33 @@ public static class HelperClass
         }
 
         return id;
+    }
+
+    public static double GetParalellResistance(List<AbstractElement> elements)
+    {
+        return GetParallelResistance((from element in elements select element.Properties.Resistance).ToList<double>());
+    }
+
+    public static double GetParallelResistance(List<double> numbers)
+    {
+        return numbers.Product() / numbers.Sum();
+    }
+
+    public static double Product(this List<double> numbers)
+    {
+        var r = 1.0;
+
+        numbers.ForEach(x => r *= x);
+
+        return r;
+    }
+
+    public static double Sum(this List<double> numbers)
+    {
+        var r = 0.0;
+
+        numbers.ForEach(x => r += x);
+
+        return r;
     }
 }
