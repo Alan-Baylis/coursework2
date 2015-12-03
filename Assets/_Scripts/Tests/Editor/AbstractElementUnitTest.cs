@@ -119,28 +119,31 @@ public class AbstractElementUnitTest
         var battery = new Battery(ElectricProperties.CreateFromUR(30, 1));
         var branch = new BranchingElement();
         var el1 = new Cable("test_one", 10, 1);
-        Debug.Log(string.Format("created element1: {0}", el1));
         var el2 = new Cable("test_one", 10, 1);
-        Debug.Log(string.Format("created element2: {0}", el2));
         var el3 = new Cable("test_one", 10, 1);
+
+        Debug.Log(string.Format("created battery: {0}", battery));
+        Debug.Log(string.Format("created branch: {0}", branch));
+        Debug.Log(string.Format("created element1: {0}", el1));
+        Debug.Log(string.Format("created element2: {0}", el2));
         Debug.Log(string.Format("created element3: {0}", el3));
+
+        battery.Connect(branch);
+        el1.Connect(el3);
+        branch.Connect(battery);
+        el3.Connect(BranchEndElement.BranchEnd);
+        el2.Connect(BranchEndElement.BranchEnd);
         branch.Branches.Add(el1);
         branch.Branches.Add(el2);
 
-        battery.Connect(branch);
-        branch.Branches[0].Connect(el3);
-        branch.Connect(battery);
-        el3.Connect(BranchEndElement.BranchEnd);
-        el1.Connect(BranchEndElement.BranchEnd);
-
-        branch.CloseBranches();
+//        branch.CloseBranches();
 
         battery.GiveProperties();
 
-        var el1Res = el1.Properties.Resistance;
-        var el2Res = el2.Properties.Resistance;
-        var el3Res = el3.Properties.Resistance;
+        var r1 = el1.Properties.Resistance;
+        var r2 = el2.Properties.Resistance;
+        var r3 = el3.Properties.Resistance;
 
-        Assert.AreEqual(HelperClass.GetParallelResistance((new List<double> { el1Res + el3Res, el2Res })), branch.Properties.Resistance);
+        Assert.AreEqual(HelperClass.GetParallelResistance((new List<double> { r1 + r3, r2 })), branch.Properties.Resistance);
     }
 }

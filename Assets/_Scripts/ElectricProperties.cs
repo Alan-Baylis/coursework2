@@ -6,7 +6,7 @@ public class ElectricProperties : ICopyable<ElectricProperties>
 	public const double LeastAmperage = 1e-6;
 	public const double LeastCurrent = 1e-6;
 
-	public bool IsConsideredPowered () // todo rename
+	public bool IsPowered ()
 	{
 		return Math.Abs (Amperage - LeastAmperage) < ToleranceOfEquality && Math.Abs (Current - LeastCurrent) < ToleranceOfEquality;
 	}
@@ -22,7 +22,7 @@ public class ElectricProperties : ICopyable<ElectricProperties>
 			return false;
 		if (ReferenceEquals (this, obj))
 			return true;
-		return obj.GetType () == this.GetType () && Equals ((ElectricProperties)obj);
+		return obj.GetType () == GetType () && Equals ((ElectricProperties)obj);
 	}
 
 	public override int GetHashCode ()
@@ -49,7 +49,7 @@ public class ElectricProperties : ICopyable<ElectricProperties>
 	public static ElectricProperties CreateFromIU (double amperage, double current)
 	{
 		var r = new ElectricProperties {Amperage = amperage, Current = current};
-        r.Resistance = (r.Amperage == 0) ? double.PositiveInfinity : r.Current / r.Amperage;
+        r.Resistance = Math.Abs(r.Amperage) < ToleranceOfEquality ? double.PositiveInfinity : r.Current / r.Amperage;
 		return r;
 	}
 
@@ -65,7 +65,7 @@ public class ElectricProperties : ICopyable<ElectricProperties>
 	public static ElectricProperties CreateFromUR (double current, double resistance)
 	{
 		var r = new ElectricProperties {Current = current, Resistance = resistance};
-        r.Amperage = r.Resistance == 0 ? double.PositiveInfinity : r.Current / r.Resistance;
+        r.Amperage = Math.Abs(r.Resistance) < ToleranceOfEquality ? double.PositiveInfinity : r.Current / r.Resistance;
 		return r;
 	}
 
@@ -75,7 +75,7 @@ public class ElectricProperties : ICopyable<ElectricProperties>
 	{
 		Amperage = amperage;
 		Current = current;
-        Resistance = Amperage == 0 ? double.PositiveInfinity : Current / Amperage;
+        Resistance = Math.Abs(Amperage) < ToleranceOfEquality ? double.PositiveInfinity : Current / Amperage;
 	}
 
 	// ReSharper disable once InconsistentNaming
@@ -90,7 +90,7 @@ public class ElectricProperties : ICopyable<ElectricProperties>
 	{
 		Current = current;
 		Resistance = resistance;
-        Amperage = Resistance == 0 ? double.PositiveInfinity : Current / Resistance;
+        Amperage = Math.Abs(Resistance) < ToleranceOfEquality ? double.PositiveInfinity : Current / Resistance;
 	}
 
 	public static bool ArePropertiesValid (ElectricProperties ep, double tolerance = 1e-13)

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 using System.Linq;
 
 public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
@@ -18,7 +19,7 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
 
     public bool Powered
     {
-        get { return Properties.IsConsideredPowered(); }
+        get { return Properties.IsPowered(); }
     }
     
     public virtual bool Conductive
@@ -48,6 +49,7 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
     {
         /*if (NextElement == null)
         {*/
+        Debug.Log(string.Format("connecting {0} with {1}, {2}", this, other, other != null));
             return (NextElement = other) != null;
         //}
         /*else
@@ -66,11 +68,9 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
         }
         //Debug.Log(string.Format("Connected elements: {0}", listOfConnectedElements.GetReadableList()));
         var batteries = listOfConnectedElements.OfType<Battery>();
-        var batteryU = 0.0;
+        var batteryU = (from battery in batteries select battery.Properties.Current).ToList<double>().Sum();
 
-        batteryU = (from battery in batteries select battery.Properties.Current).ToList<double>().Sum();
-
-        var circuitR = (from element in listOfConnectedElements select element.Properties.Resistance).ToList<double>().Sum();
+        var circuitR = (from element in listOfConnectedElements where !(element is BranchEndElement) select element.Properties.Resistance).ToList<double>().Sum();
 
         foreach (var connectedElement in listOfConnectedElements)
         {
@@ -192,9 +192,9 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
     }
     private ElectricProperties properties;
 
-    public virtual void SetCurrent(double current)
+    public virtual void SetCurrent(double newCurrent)
     {
-        properties.SetUR(current, properties.Resistance);
+        properties.SetUR(newCurrent, properties.Resistance);
     }
 
     #endregion

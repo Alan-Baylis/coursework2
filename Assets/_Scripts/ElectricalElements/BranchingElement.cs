@@ -1,6 +1,6 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class BranchingElement : AbstractElement {
 
@@ -51,24 +51,26 @@ public class BranchingElement : AbstractElement {
         foreach (var i in Branches)
         {
             var el = i;
-            for (; el != null && !(el is BranchEndElement); el = el.NextElement);
-            if (!(el is BranchEndElement))
-                el = BranchEndElement.BranchEnd;
+            for (; el.NextElement != null && !(el.NextElement is BranchEndElement); el = el.NextElement)
+            {
+            }
+            if (el.NextElement == null)
+                el.Connect(BranchEndElement.BranchEnd);
         }
     }
 
     public override void Draw()
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 
     public override Rect DragableRect
     {
-        get { throw new System.NotImplementedException(); }
+        get { throw new NotImplementedException(); }
     }
 
-    public override void SetCurrent(double current)
+    public override void SetCurrent(double newCurrent)
     {
-        this.current = current;
+        current = newCurrent;
     }
 }
