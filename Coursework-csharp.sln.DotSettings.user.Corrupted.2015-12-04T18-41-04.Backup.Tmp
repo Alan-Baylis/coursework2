@@ -1,0 +1,6 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=CheckNamespace/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+	<s:Boolean x:Key="/Default/Housekeeping/UnitTestingMru/UnitTestSessionPersistentData/=FEAB204C6ED94A3A94763885429C9BE5/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/Housekeeping/UnitTestingMru/UnitTestSessionPersistentData/=FEAB204C6ED94A3A94763885429C9BE5/GroupingIndex/@EntryValue">4</s:Int64>
+	<s:String x:Key="/Default/Housekeeping/UnitTestingMru/UnitTestSessionPersistentData/=FEAB204C6ED94A3A94763885429C9BE5/Name/@EntryValue">ConnectingBigCircuitWithLotsOfBranches</s:String>
+	<s:String x:Key="/Default/Housekeeping/UnitTestingMru/UnitTestSessionPersistentData/=FEAB204C6ED94A3A94763885429C9BE5/XmlSerializedElements/@EntryValue">&lt;Session&gt;&lt;e Id="AbstractElementUnitTest" Project="015B7F8D-7EA1-B136-A18B-1C0F8E7608E4" Provider="nUnit" /&gt;&lt;/Session&gt;</s:String></wpf:ResourceDictionary>
