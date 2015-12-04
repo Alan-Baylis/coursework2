@@ -29,14 +29,14 @@ public class BranchingElement : AbstractElement {
                         sum = 0;
                         break;
                     }
-                    Debug.Log(string.Format("summing {0}: sum += {1}; next element: {2}", el, el.Properties.Resistance, el.NextElement));
+                    //Debug.Log(string.Format("summing {0}: sum += {1}; next element: {2}", el, el.Properties.Resistance, el.NextElement));
                     sum += el.Properties.Resistance;
                 }
-                Debug.Log(string.Format("sum is {0}", sum));
+                //Debug.Log(string.Format("sum is {0}", sum));
                 sums.Add(sum);
-                Debug.Log("---------------------");
+                //Debug.Log("---------------------");
             }
-            Debug.Log("----function ended---");
+            //Debug.Log("----function ended---");
             return ElectricProperties.CreateFromUR(current, HelperClass.GetParallelResistance(sums));
         }
 

@@ -12,11 +12,11 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
         {
             if (FirstJoint.Target == null)
             {
-                Debug.Log(string.Format("{0} has target as null", this));
+                //Debug.Log(string.Format("{0} has target as null", this));
                 return null;
             }
             if (FirstJoint.Target.Parent != null) return (AbstractElement) (FirstJoint.Target.Parent);
-            Debug.Log(string.Format("{0} has target.parent as null", this));
+            //Debug.Log(string.Format("{0} has target.parent as null", this));
             return null;
         }
         protected set { FirstJoint.Connect(value); }
@@ -54,7 +54,7 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
     {
         /*if (NextElement == null)
         {*/
-        Debug.Log(string.Format("connecting {0} with {1}, {2}", this, other, other != null));
+        //Debug.Log(string.Format("connecting {0} with {1}, {2}", this, other, other != null));
             return (NextElement = other) != null;
         //}
         /*else
@@ -171,9 +171,9 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
     {
         properties = ElectricProperties.CreateFromUR(0, resistance);
         joints.Add(new NodeJointPoint(this));
-        var message = "created " + this + "!!! Joints are " + joints.Count + " and they are ";
+        /*var message = "created " + this + "!!! Joints are " + joints.Count + " and they are ";
         message = joints.Aggregate(message, (current, point) => current + string.Format("parentId = {0}, targetId = {1}", point.ParentId, point.TargetId));
-        Debug.Log(message);
+        Debug.Log(message);*/
     }
 
     protected AbstractElement() : this(null)

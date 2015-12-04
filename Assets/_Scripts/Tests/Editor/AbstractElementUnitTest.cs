@@ -122,11 +122,11 @@ public class AbstractElementUnitTest
         var el2 = new Cable("test_one", 10, 1);
         var el3 = new Cable("test_one", 10, 1);
 
-        Debug.Log(string.Format("created battery: {0}", battery));
+        /*Debug.Log(string.Format("created battery: {0}", battery));
         Debug.Log(string.Format("created branch: {0}", branch));
         Debug.Log(string.Format("created element1: {0}", el1));
         Debug.Log(string.Format("created element2: {0}", el2));
-        Debug.Log(string.Format("created element3: {0}", el3));
+        Debug.Log(string.Format("created element3: {0}", el3));*/
 
         battery.Connect(branch);
         el1.Connect(el3);
