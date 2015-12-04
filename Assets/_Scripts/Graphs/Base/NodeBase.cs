@@ -21,6 +21,7 @@ public abstract class NodeBase: NodeDrawableBase
     {
         get
         {
+            //Debug.Log("Joints count in " + this + " = " + joints.Count);
             return joints[0];
         }
         protected set

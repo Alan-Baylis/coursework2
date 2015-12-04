@@ -2,7 +2,7 @@
 using UnityEngine;
 
 public sealed class BranchEndElement : AbstractElement {
-    public const string BranchEndId = "end";
+    public const string BranchEndId = "-100";
     private readonly ElectricProperties invalidProperties = ElectricProperties.CreateFromUR(0, 1);
     private static BranchEndElement branchEnd;
     public static BranchEndElement BranchEnd { get { return new BranchEndElement(); } }
@@ -15,7 +15,7 @@ public sealed class BranchEndElement : AbstractElement {
 
     private BranchEndElement() : base(null)
     {
-        Id = BranchEndId;
+        //Id = BranchEndId;
     }
 
     public override Rect DragableRect
@@ -26,5 +26,11 @@ public sealed class BranchEndElement : AbstractElement {
     public override void Draw()
     {
         throw new NotImplementedException();
+    }
+
+    public override string Id
+    {
+        get { return BranchEndId; }
+        set {  }
     }
 }

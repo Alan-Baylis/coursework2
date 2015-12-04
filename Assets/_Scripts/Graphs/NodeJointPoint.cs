@@ -87,6 +87,7 @@ public class NodeJointPoint
 		Target = target != null ? target.FirstJoint : null;
 		TargetId = target != null ? target.Id : NodeDrawableBase.NothingId;
 		ParentId = parent.Id;
+        Debug.Log("in " + parent + ", ID=" + parent.Id);
 	}
 
 	public NodeJointPoint (NodeDrawableBase parent, NodeBase target = null)
@@ -108,7 +109,9 @@ public class NodeJointPoint
 	/// </summary>
 	public bool Connect (NodeBase target)
 	{
-		/*if (target == null) {
+		/*
+        // faster:
+        if (target == null) {
 			TargetId = NodeDrawableBase.NothingId;
 			Target = null;
             return false;

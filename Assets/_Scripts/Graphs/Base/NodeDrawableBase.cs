@@ -12,7 +12,7 @@ public abstract class NodeDrawableBase
 	/// The unique identifier of drawable.
 	/// </summary>
 	[To2dnd.TDataMember]
-	public string Id { get; set; }
+	public virtual string Id { get; set; }
     #region Deprecated
     /// <summary>
     /// The position of drawable.

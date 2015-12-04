@@ -10,9 +10,14 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
     {
         get
         {
-            if (FirstJoint.Target == null || FirstJoint.Target.Parent == null)
+            if (FirstJoint.Target == null)
+            {
+                Debug.Log(string.Format("{0} has target as null", this));
                 return null;
-            return (AbstractElement)(FirstJoint.Target.Parent);
+            }
+            if (FirstJoint.Target.Parent != null) return (AbstractElement) (FirstJoint.Target.Parent);
+            Debug.Log(string.Format("{0} has target.parent as null", this));
+            return null;
         }
         protected set { FirstJoint.Connect(value); }
     }
@@ -166,6 +171,9 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
     {
         properties = ElectricProperties.CreateFromUR(0, resistance);
         joints.Add(new NodeJointPoint(this));
+        var message = "created " + this + "!!! Joints are " + joints.Count + " and they are ";
+        message = joints.Aggregate(message, (current, point) => current + string.Format("parentId = {0}, targetId = {1}", point.ParentId, point.TargetId));
+        Debug.Log(message);
     }
 
     protected AbstractElement() : this(null)
