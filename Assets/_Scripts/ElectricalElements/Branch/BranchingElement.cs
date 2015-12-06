@@ -2,16 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BranchingElement : AbstractElement {
-
-    public List<AbstractElement> Branches { get; protected set; }
-
+public class BranchingElement : AbstractElement
+{
     public BranchingElement() : base(null)
     {
         Branches = new List<AbstractElement>();
     }
 
-    private double current;
+    public List<AbstractElement> Branches { get; protected set; }
 
     public override ElectricProperties Properties
     {
@@ -22,7 +20,7 @@ public class BranchingElement : AbstractElement {
             {
                 //var el = i;
                 var sum = 0.0;
-                for (var el = i; !(el is BranchEndElement); el = el.NextElement )
+                for (var el = i; !(el is BranchEndElement); el = el.NextElement)
                 {
                     if (el == null)
                     {
@@ -37,13 +35,18 @@ public class BranchingElement : AbstractElement {
                 //Debug.Log("---------------------");
             }
             //Debug.Log("----function ended---");
-            return ElectricProperties.CreateFromUR(current, HelperClass.GetParallelResistance(sums));
+            return ElectricProperties.CreateFromIR(base.Properties.Amperage, HelperClass.GetParallelResistance(sums));
         }
 
         protected set
         {
-            SetCurrent(value.Current);
+            SetAmperage(value.Amperage);
         }
+    }
+
+    public override Rect DragableRect
+    {
+        get { throw new NotImplementedException(); }
     }
 
     public void CloseBranches()
@@ -64,13 +67,12 @@ public class BranchingElement : AbstractElement {
         throw new NotImplementedException();
     }
 
-    public override Rect DragableRect
+    public override void SetAmperage(double newAmperage)
     {
-        get { throw new NotImplementedException(); }
-    }
-
-    public override void SetCurrent(double newCurrent)
-    {
-        current = newCurrent;
+        base.SetAmperage(newAmperage);
+        foreach (var i in Branches)
+        {
+            HelperClass.DoWithChain(i, (element => element.SetAmperage(newAmperage)), x => (x != null && !(x is BranchEndElement)));
+        }
     }
 }

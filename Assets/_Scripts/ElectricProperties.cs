@@ -71,7 +71,7 @@ public class ElectricProperties : ICopyable<ElectricProperties>
 
 
 	// ReSharper disable once InconsistentNaming
-	public void SetIU (double amperage, double current)
+    public virtual void SetIU(double amperage, double current)
 	{
 		Amperage = amperage;
 		Current = current;
@@ -79,14 +79,14 @@ public class ElectricProperties : ICopyable<ElectricProperties>
 	}
 
 	// ReSharper disable once InconsistentNaming
-	public void SetIR (double amperage, double resistance)
+	public virtual void SetIR (double amperage, double resistance)
 	{
 		Amperage = amperage;
 		Resistance = resistance;
 		Current = Amperage * Resistance;
 	}
 
-	public void SetUR (double current, double resistance)
+    public virtual void SetUR(double current, double resistance)
 	{
 		Current = current;
 		Resistance = resistance;

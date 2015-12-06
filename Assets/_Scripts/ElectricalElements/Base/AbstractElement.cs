@@ -63,23 +63,24 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
         }*/
     }
 
-    public virtual void GiveProperties()
+    protected virtual void GiveProperties()
     {
         var listOfConnectedElements = NextElement == null ? null : NextElement.GetListOfConnectedElements(this);
         if (listOfConnectedElements == null)
         {
-            //Debug.Log("No connected elements.");
+            Debug.Log("No connected elements.");
             return;
         }
-        //Debug.Log(string.Format("Connected elements: {0}", listOfConnectedElements.GetReadableList()));
+        Debug.Log(string.Format("Connected elements: {0}", listOfConnectedElements.GetReadableList()));
         var batteries = listOfConnectedElements.OfType<Battery>();
         var batteryU = (from battery in batteries select battery.Properties.Current).ToList<double>().Sum();
 
         var circuitR = (from element in listOfConnectedElements where !(element is BranchEndElement) select element.Properties.Resistance).ToList<double>().Sum();
-
+        var amperage = batteryU/circuitR;
         foreach (var connectedElement in listOfConnectedElements)
         {
-            connectedElement.Properties.SetIR(batteryU / circuitR, connectedElement.Properties.Resistance);
+            //connectedElement.Properties.SetIR(batteryU / circuitR, connectedElement.Properties.Resistance);
+            connectedElement.SetAmperage(amperage);
         }
     }
 
@@ -146,17 +147,6 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
         return string.Format("{0}({1})", GetType(), Id);
     }
 
-    public double GetSeriesResistance(List<AbstractElement> elements)
-    {
-        //return elements.Sum<AbstractElement>(x => x.Properties.Resistance);
-        return (from element in elements select element.Properties.Resistance).ToList<double>().Sum();
-    }
-
-    public double GetSeriesResistance(List<double> numbers)
-    {
-        return numbers.Sum();
-    }
-
     #region Constructors & destructors
 
     protected AbstractElement(ElectricProperties props)
@@ -203,6 +193,11 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
     public virtual void SetCurrent(double newCurrent)
     {
         properties.SetUR(newCurrent, properties.Resistance);
+    }
+
+    public virtual void SetAmperage(double newAmperage)
+    {
+        properties.SetIR(newAmperage, properties.Resistance);
     }
 
     #endregion

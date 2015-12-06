@@ -2,29 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using UnityEngine.UI;
 
 public static class HelperClass
 {
-    #region resistivity table
-    private static readonly Dictionary<string, double> ResistivityTable = new Dictionary<string, double>()
-    {
-        {"copper", 1.68e-8},
-        {"silver", 1.59e-8},
-        {"aluminium", 2.65e-8},
-        {"graphene", 1e-8},
-        {"test_one", 1.0}
-    };
+    public delegate object DoSomethingWithList(List<object> objs);
 
-    public static double GetResistivity(string s)
-    {
-        return ResistivityTable[s];
-    }
+    public delegate void DoSomethingWithElement(AbstractElement element);
 
-    public static void SetResistivity(string s, double newValue)
-    {
-        ResistivityTable[s] = newValue;
-    }
-    #endregion
+    public delegate bool CheckFunction(AbstractElement element);
 
     public static string GetReadableList<T>(this List<T> list)
     {
@@ -37,7 +23,7 @@ public static class HelperClass
     }
 
     /// <summary>
-    /// Connects element from list to another element from that list.
+    ///     Connects element from list to another element from that list.
     /// </summary>
     /// <param name="all">list</param>
     /// <param name="ind1">index of element which you connect</param>
@@ -54,7 +40,7 @@ public static class HelperClass
 
     public static Battery GetRandomBattery(Random random)
     {
-        return new Battery(ElectricProperties.CreateFromUR(random.Next(10, 20), random.Next(1, 3)));
+        return new Battery(random.Next(10, 20), random.Next(1, 3));
     }
 
     public static string IdRefinition(string id, List<string> ids)
@@ -84,7 +70,7 @@ public static class HelperClass
 
     public static double GetParallelResistance(List<double> numbers)
     {
-        return numbers.Product() / numbers.Sum();
+        return numbers.Product()/numbers.Sum();
     }
 
     public static double Product(this List<double> numbers)
@@ -104,4 +90,66 @@ public static class HelperClass
 
         return r;
     }
+
+    public static object GetPropertiesOfChain(AbstractElement beginning, string meta, DoSomethingWithList func=null)
+    {
+        if (func == null)
+            func = objectsList => (from element in objectsList select (double) (element)).ToList().Sum();
+        switch (meta)
+        {
+            case "resistance":
+            {
+                var objects = new List<object>();
+                for (var i = beginning; i != null; i = i.NextElement)
+                {
+                    objects.Add(i.Properties.Resistance);
+                }
+                return func(objects);
+            }
+            case "current":
+            {
+                var objects = new List<object>();
+                for (var i = beginning; i != null; i = i.NextElement)
+                {
+                    objects.Add(i.Properties.Current);
+                }
+                return func(objects);
+            }
+            default:
+                return null;
+        }
+    }
+
+    public static void DoWithChain(AbstractElement beginning, DoSomethingWithElement func, CheckFunction isNotTheEnd=null)
+    {
+        if (isNotTheEnd == null)
+            isNotTheEnd = x => x != null;
+        for (var i = beginning; isNotTheEnd(i); i = i.NextElement)
+        {
+            func(i);
+        }
+    }
+
+    #region resistivity table
+
+    private static readonly Dictionary<string, double> ResistivityTable = new Dictionary<string, double>
+    {
+        {"copper", 1.68e-8},
+        {"silver", 1.59e-8},
+        {"aluminium", 2.65e-8},
+        {"graphene", 1e-8},
+        {"test_one", 1.0}
+    };
+
+    public static double GetResistivity(string s)
+    {
+        return ResistivityTable[s];
+    }
+
+    public static void SetResistivity(string s, double newValue)
+    {
+        ResistivityTable[s] = newValue;
+    }
+
+    #endregion
 }

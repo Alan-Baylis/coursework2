@@ -14,11 +14,11 @@ public class AbstractElementUnitTest
          *   \___/
          */
 		var cable = HelperClass.GetRandomCable(random);
-        var battery = new Battery(ElectricProperties.CreateFromUR(5, 2));
+        var battery = new Battery(5, 2);
 
         cable.Connect(battery);
         battery.Connect(cable);
-        cable.GiveProperties();
+        battery.GiveProperties();
 
 		Assert.AreEqual (cable.Properties.Amperage, battery.Properties.Amperage);
 	}
@@ -31,14 +31,14 @@ public class AbstractElementUnitTest
          *   \_______/
          */
         var cable1 = HelperClass.GetRandomCable(random);
-        var battery = new Battery(ElectricProperties.CreateFromUR(2, 10));
+        var battery = new Battery(2, 10);
         var cable2 = HelperClass.GetRandomCable(random);
         cable2.Properties.SetUR(2, 3);
 
         cable1.Connect(battery);
         battery.Connect(cable2);
         cable2.Connect(cable1);
-        cable1.GiveProperties();
+        battery.GiveProperties();
         Assert.AreEqual(battery.Properties.Amperage, cable1.Properties.Amperage);
     }
 
@@ -116,7 +116,7 @@ public class AbstractElementUnitTest
          *          (3)---->
          */
 
-        var battery = new Battery(ElectricProperties.CreateFromUR(30, 1));
+        var battery = new Battery(30, 1);
         var branch = new BranchingElement();
         var el1 = new Cable("test_one", 10, 1);
         var el2 = new Cable("test_one", 10, 1);
@@ -131,12 +131,12 @@ public class AbstractElementUnitTest
         battery.Connect(branch);
         el1.Connect(el3);
         branch.Connect(battery);
-        el3.Connect(BranchEndElement.BranchEnd);
-        el2.Connect(BranchEndElement.BranchEnd);
+//        el3.Connect(BranchEndElement.BranchEnd);
+//        el2.Connect(BranchEndElement.BranchEnd);
         branch.Branches.Add(el1);
         branch.Branches.Add(el2);
 
-//        branch.CloseBranches();
+        branch.CloseBranches();
 
         battery.GiveProperties();
 

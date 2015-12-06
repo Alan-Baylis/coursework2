@@ -21,13 +21,13 @@ public class KeyUnitTest {
         HelperClass.Join(elementsList, 1, 2);
         HelperClass.Join(elementsList, 2, 3);
         HelperClass.Join(elementsList, 3, 0);
-        elementsList[0].GiveProperties();
+        ((Battery)elementsList[0]).GiveProperties();
 
         Assert.AreNotEqual(elementsList[0].Properties.Amperage, elementsList[1].Properties.Amperage);
 
         key.Switch();
 
-        elementsList[0].GiveProperties();
+        ((Battery)elementsList[0]).GiveProperties();
 
         Assert.AreEqual(elementsList[0].Properties.Amperage, elementsList[1].Properties.Amperage);
     }

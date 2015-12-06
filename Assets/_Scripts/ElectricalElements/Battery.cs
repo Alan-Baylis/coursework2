@@ -1,7 +1,12 @@
 ﻿public class Battery : AbstractElement
 {
-    public Battery(ElectricProperties props) : base(props)
+    public Battery(double current, double innerResistance) : base(ElectricProperties.CreateFromUR(current, innerResistance))
     {
+    }
+
+    public new void GiveProperties()
+    {
+        base.GiveProperties();
     }
 
     #region implemented abstract members of NodeDrawableBase
