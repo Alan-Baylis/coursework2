@@ -1,22 +1,42 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class ElementController : MonoBehaviour
 {
-    public Transform outPoint;
-    public Transform inPoint;
+    public enum ElementMode
+    {
+        Drag, Connect, Idle
+    }
+    protected const string InPointName = "inPoint";
+    protected const string OutPointName = "outPoint";
+    protected const float ElementsZ = 4;
+    protected const float SecondsToDrag = 0.8f;
+    public Transform OutPoint { get; protected set; }
+    public Transform InPoint { get; protected set; }
+    public string Id { get; set; }
+    public ElementMode currentMode;
+    // Use this for initialization
 
-    protected const string inPointName = "inPoint";
-    protected const string outPointName = "outPoint";
+    private void Start()
+    {
+        if (InPoint == null)
+            InPoint = transform.FindChild(InPointName);
+        if (OutPoint == null)
+            OutPoint = transform.FindChild(OutPointName);
+    }
 
-	// Use this for initialization
-	void Start ()
-	{
-	    inPoint = transform.FindChild(inPointName);
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    // Update is called once per frame
+    private void OnMouseDrag()
+    {
+        var timer = 0f;
+        while (timer <= SecondsToDrag)
+        {
+            timer += Time.deltaTime;
+        }
+        transform.parent.position =
+            Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, ElementsZ));
+    }
+
+    private void Update()
+    {
+    }
 }
