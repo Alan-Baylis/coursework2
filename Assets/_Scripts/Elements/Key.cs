@@ -16,6 +16,11 @@ public class Key : AbstractElement {
         On = state;
     }
 
+    public Key(double resistance, bool state = false)
+        : this(state, ElectricProperties.CreateFromUR(0, resistance))
+    {
+    }
+
     public override bool Conductive
     {
         get

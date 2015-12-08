@@ -14,15 +14,9 @@ public class ElectricalCircuit : MonoBehaviour
     }
 
     protected GameObject inspector;
-    public List<AbstractElement> elements;
-    public List<Battery> Batteries { get { return elements.OfType<Battery>().ToList(); } }
-    public List<ElementController> RealElements { 
-        get
-        {// elements.Exists(y => x.Id == y.Id) = true
-            return FindObjectsOfType<ElementController>().ToList();
-        }
-    }
-    protected const float SecondsToDrag = 0.8f;
+    public List<AbstractElement> AllElements { get { return AbstractElement.allDrawableBases.OfType<AbstractElement>().ToList<AbstractElement>(); } }
+    public List<Battery> Batteries { get { return AllElements.OfType<Battery>().ToList(); } }
+    public List<ElementController> realElements = new List<ElementController>();
 
     void Awake()
     {
@@ -49,51 +43,81 @@ public class ElectricalCircuit : MonoBehaviour
         }*/
     }
 
+    public ElementController GetControllerByElement(AbstractElement element)
+    {
+        return (from element2 in realElements where element2.Id == element.Id select element2).ToList().FirstOrDefault<ElementController>();
+    }
+
+    public AbstractElement GetElementByController(ElementController controller)
+    {
+        return (from element in AllElements where element.Id == controller.Id select element).ToList().FirstOrDefault<AbstractElement>();
+    }
+
+    public void CreatePairForElement(AbstractElement element)
+    {
+        var type = element.GetType().ToString();
+        type = type.ToLower();
+        var gameTemp = Instantiate(ResourcesManager.Instance.entries.FirstOrDefault<ResourcesManager.Entry>(x => x.name == type).prefab);
+        var gameTempController = gameTemp.GetComponentInChildren<ElementController>();
+        gameTemp.transform.position = new Vector3(0, 0, 0);
+        gameTempController.Id = element.Id;
+    }
+
     public void Connect(string id1, string id2)
     {
-        var firstOrDefault = elements.FirstOrDefault(x => x.Id == id1);
+        var firstOrDefault = AllElements.FirstOrDefault(x => x.Id == id1);
         if (firstOrDefault != null)
-            firstOrDefault.Connect(elements.FirstOrDefault(x => x.Id == id2));
+            firstOrDefault.Connect(AllElements.FirstOrDefault(x => x.Id == id2));
 
-        Batteries.ForEach(x=>x.GiveProperties());
+        Batteries.FirstOrDefault<Battery>().GiveProperties();
     }
 
     public void AddBattery()
     {
-        var temp = new Battery(30, 2);
-        var gameTemp = Instantiate(FindObjectOfType<ResourcesManager>().batteryPrefab);
-        var gameTempController = gameTemp.GetComponent<ElementController>();
-        gameTempController.Id = temp.Id;
-        elements.Add(temp);
+        var temp = HelperClass.GetRandomBattery();
+        CreatePairForElement(temp);
+        AllElements.Add(temp);
     }
 
     public void AddResistor()
     {
-
+        var temp = new Resistor(2);
+        CreatePairForElement(temp);
+        AllElements.Add(temp);
     }
 
     public void AddKey()
     {
-
+        var temp = new Key(1, true);
+        CreatePairForElement(temp);
+        AllElements.Add(temp);
     }
 
     public void AddCable()
     {
-
+        var temp = HelperClass.GetRandomCable();
+        CreatePairForElement(temp);
+        AllElements.Add(temp);
     }
 
     public void AddAmmeter()
     {
-
+        var temp = new Ammeter(4);
+        CreatePairForElement(temp);
+        AllElements.Add(temp);
     }
 
     public void AddVoltmeter()
     {
-
+        var temp = new Voltmeter(4);
+        CreatePairForElement(temp);
+        AllElements.Add(temp);
     }
 
     public void AddOhmmeter()
     {
-
+        var temp = new Ohmmeter(4);
+        CreatePairForElement(temp);
+        AllElements.Add(temp);
     }
 }

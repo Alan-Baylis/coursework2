@@ -36,13 +36,14 @@ public static class HelperClass
         all[ind1].Connect(all[ind2]);
     }
 
-    public static Cable GetRandomCable(Random random)
+    public static Cable GetRandomCable(Random random=null)
     {
         return new Cable("copper", random.Next(1, 5), random.Next(1, 10));
     }
 
-    public static Battery GetRandomBattery(Random random)
+    public static Battery GetRandomBattery(Random random=null)
     {
+        random = random ?? new Random();
         return new Battery(random.Next(10, 20), random.Next(1, 3));
     }
 

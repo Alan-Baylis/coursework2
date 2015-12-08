@@ -11,9 +11,13 @@ public class ElementController : MonoBehaviour
     public string Id { get; set; }
     // Use this for initialization
 
+    public ElementController()
+    {
+        ElectricalCircuit.Instance.realElements.Add(this);
+    }
+
     void Awake()
     {
-        DontDestroyOnLoad(gameObject);
     }
 
     void Start()

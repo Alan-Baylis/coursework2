@@ -1,14 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEditor;
+using System.Collections.Generic;
 
 public class ResourcesManager : MonoBehaviour
 {
-    public GameObject batteryPrefab;
-    public GameObject resistorPrefab;
-    public GameObject keyPrefab;
-    public GameObject cablePrefab;
-    public GameObject ammeterPrefab;
-    public GameObject voltmeterPrefab;
-    public GameObject ohmmeterPrefab;
+    public static ResourcesManager Instance { get; protected set; }
+    public struct Entry
+    {
+        public string name;
+        public GameObject prefab;
+    }
+    public List<Entry> entries = new List<Entry>();
+
+    void Awake()
+    {
+        Instance = this;
+    }
 }
