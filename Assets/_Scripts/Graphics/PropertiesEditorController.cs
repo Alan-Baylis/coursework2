@@ -1,19 +1,21 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 public class PropertiesEditorController : MonoBehaviour {
 
-    const string fieldObjectsPrefix = "Field";
+    const string FieldObjectsPrefix = "Field";
 
-    public class MyUIEditField
+    public class MyUiEditField
     {
-        public GameObject Parent { get; protected set; }
+        public Transform Parent { get; protected set; }
         public InputField inputField;
         public Text label;
 
-        public MyUIEditField(GameObject parent)
+        public MyUiEditField(Transform parent)
         {
             Parent = parent;
             inputField = parent.GetComponentInChildren<InputField>();
@@ -62,26 +64,39 @@ public class PropertiesEditorController : MonoBehaviour {
         }
     }
 
-    public List<MyUIEditField> fields = new List<MyUIEditField>();
+    public List<MyUiEditField> fields = new List<MyUiEditField>();
 
 	// Use this for initialization
-	void Start () {
+    [UsedImplicitly]
+    void Start () {
         for (var i = 0; i < 5; ++i)
         {
-            var t = transform.FindChild(fieldObjectsPrefix + i).gameObject;
-            if (t != null)
+            Transform gameObjectOfFieldParent;
+            try
             {
-                var field = new MyUIEditField(t);
-                fields.Add(field);
-                Debug.Log(field);
+                gameObjectOfFieldParent = transform.FindChild(FieldObjectsPrefix + i);
             }
+            catch (NullReferenceException)
+            {
+                Debug.LogErrorFormat("The object {0} has no {1} child", transform.gameObject.name, FieldObjectsPrefix+i);
+                continue;
+            }
+            if (gameObjectOfFieldParent == null) continue;
+            var field = new MyUiEditField(gameObjectOfFieldParent);
+            fields.Add(field);
+            Debug.LogFormat("{0} obtained", field);
         }
-
-        fields.ForEach(x => x.Placeholder = "no element");
+        ResetPlaceholders();
 	}
+
+    public void ResetPlaceholders(string s = "no element")
+    {
+        fields.ForEach(x => x.Placeholder = s);
+    }
 	
 	// Update is called once per frame
-	void Update () {
+    [UsedImplicitly]
+    void Update () {
 	
 	}
 }
