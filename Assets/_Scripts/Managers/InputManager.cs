@@ -1,26 +1,47 @@
 ﻿using System;
-using UnityEngine;
-using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using UnityEditor;
+using UnityEngine;
 
 public class InputManager : MonoBehaviour
 {
-
     public enum ElementMode
     {
-        Idle, Drag, Connect
+        Idle,
+        Properties,
+        Drag,
+        Connect
     }
 
+    public float clickTime = 0.3f;
     public ElementMode currentMode;
+    private bool isActive;
+    public bool isPressed;
+    public float timer;
+    private ElementController newElement;
+
+    private ElementController NewElement
+    {
+        get { return newElement; }
+        set
+        {
+            Debug.LogFormat("Setting newElement to {0}", value);
+            newElement = value;
+        }
+    }
+
     public static InputManager Instance { get; private set; }
     public ElementController CurrentElement { get; protected set; }
 
+    protected void SetMode(ElementMode mode)
+    {
+        Debug.LogFormat("Setting mode to {0}", mode.ToString());
+        currentMode = mode;
+    }
+
     public bool IsActive
     {
-        get
-        { return isActive; }
+        get { return isActive; }
         set
         {
             if (value && LockerCount == 0)
@@ -33,16 +54,9 @@ public class InputManager : MonoBehaviour
             }
         }
     }
+
     public bool IsUserControll { get; set; }
-
     public int LockerCount { get; private set; }
-    public float clickTime = 0.5f;
-
-    private bool isActive;
-
-    public float timer;
-    public bool isPressed;
-
     // ------------------------------------------------------------------------
     [UsedImplicitly]
     private void Awake()
@@ -50,7 +64,7 @@ public class InputManager : MonoBehaviour
         Instance = this;
         IsActive = true;
         IsUserControll = true;
-        currentMode = ElementMode.Idle;
+        SetMode(ElementMode.Idle);
     }
 
     [UsedImplicitly]
@@ -58,12 +72,26 @@ public class InputManager : MonoBehaviour
     {
         switch (currentMode)
         {
+            case ElementMode.Idle:
+                break;
+            case ElementMode.Properties:
+
+                break;
             case ElementMode.Connect:
-                HelperClass.DrawConnection(CurrentElement.OutPoint.position, Camera.main.ScreenToWorldPoint(new Vector2(Input.mousePosition.x, Input.mousePosition.y)));
+                if (CurrentElement != null)
+                {
+                    HelperClass.DrawConnection(CurrentElement.outPoint.position,
+                        Camera.main.ScreenToWorldPoint(new Vector2(Input.mousePosition.x, Input.mousePosition.y)));
+                }
                 break;
             case ElementMode.Drag:
-                if(isPressed)
-                    CurrentElement.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 4));
+                if (isPressed)
+                    CurrentElement.transform.position =
+                        Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, CurrentElement.transform.position.z));
+                else
+                {
+                    SetMode(ElementMode.Properties);
+                }
                 break;
         }
     }
@@ -104,40 +132,22 @@ public class InputManager : MonoBehaviour
     // ------------------------------------------------------------------------
     public void PressLeftButton()
     {
-        ElementController objectBase = null;
         if (Input.GetMouseButtonDown(0))
         {
             isPressed = true;
             timer = 0;
-            objectBase = GetObjectFromCursor();
+            NewElement = GetObjectFromCursor();
         }
-        // obtain object
-        currentMode = (objectBase != null) ? timer > clickTime ? ElementMode.Drag : ElementMode.Connect : ElementMode.Idle;
-        if (!Input.GetMouseButtonUp(0) && !Input.GetMouseButtonUp(2)) return;
-        
-        ParseObject(objectBase);
+        if (timer > clickTime && NewElement != null && isPressed && currentMode == ElementMode.Properties)
+        {
+            SetMode(ElementMode.Drag);
+        }
+        if (!Input.GetMouseButtonUp(0) && !Input.GetMouseButtonUp(2))
+        {
+            return;
+        }
+        HandleClick(NewElement);
         isPressed = false;
-    }
-
-    private ElementController GetObjectFromCursor()
-    {
-        var obj = Raycast(Input.mousePosition, float.MaxValue);
-        if (obj == null)
-        {
-            Debug.Log("No Element controller under the cursor");
-            return null;
-        }
-        var parent = obj.transform.parent;
-        ElementController ec = null;
-        try
-        {
-            ec = parent.GetComponentInChildren<ElementController>();
-        }
-        catch (Exception)
-        {
-            Debug.LogWarningFormat("Cannot find element controller in object called {0}", obj.name);
-        }
-        return ec;
     }
 
     // ------------------------------------------------------------------------
@@ -149,34 +159,102 @@ public class InputManager : MonoBehaviour
     }
 
     // ------------------------------------------------------------------------
-    private void ParseObject(ElementController objectBase)
+    private void HandleClick(ElementController objectBase)
     {
-        CurrentElement = objectBase;
+        Debug.LogFormat("NewElement == null --> {0}", objectBase == null);
         //Handle the press on an object
         switch (currentMode)
         {
+            case ElementMode.Idle:
+                if (objectBase != null)
+                {
+                    SetMode(ElementMode.Properties);
+                    CurrentElement = objectBase;
+                }
+                break;
+            case ElementMode.Properties:
+                if (objectBase == null)
+                {
+                    SetMode(ElementMode.Idle);
+                    CurrentElement = null;
+                }
+                else
+                {
+                    if (objectBase == CurrentElement)
+                    {
+                        SetMode(ElementMode.Connect);
+                        CurrentElement = objectBase;
+                    }
+                    CurrentElement = objectBase;
+                }
+                break;
             case ElementMode.Drag:
-                if(isPressed)
-                    CurrentElement.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 4));
+                /*if (isPressed)
+                    CurrentElement.transform.position =
+                        Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 4));*/
+                if (objectBase == null)
+                {
+                    SetMode(ElementMode.Idle);
+                    CurrentElement = null;
+                }
+                else
+                {
+                    SetMode(ElementMode.Properties);
+                }
                 break;
             case ElementMode.Connect:
-                if (CurrentElement != null && CurrentElement != objectBase)
+                if (objectBase == null)
                 {
-                    // Connect to found element
-                    ElectricalCircuit.Instance.Connect(CurrentElement.Id, objectBase.Id);
+                    SetMode(ElementMode.Properties);
                 }
-                currentMode = ElementMode.Idle;
-                CurrentElement = null;
+                else
+                {
+                    if (CurrentElement != null && CurrentElement != objectBase)
+                    {
+                        ElectricalCircuit.Instance.Connect(CurrentElement.Id, objectBase.Id);
+                    }
+                    currentMode = ElementMode.Idle;
+                    CurrentElement = null;
+                }
                 break;
+            /*default:
+                currentMode = ElementMode.Idle;
+            break;*/
         }
     }
 
-    public GameObject Raycast(Vector3 target, float distance)
+    #region Getting objects from scene
+
+    private ElementController GetObjectFromCursor()
+    {
+        var obj = Raycast(Input.mousePosition, float.MaxValue);
+        if (obj == null)
+        {
+            Debug.LogWarning("No Element controller under the cursor");
+            return null;
+        }
+        Debug.LogFormat("Raycast got {0}", obj.name);
+
+        return obj;
+    }
+
+    public ElementController Raycast(Vector3 target, float distance)
     {
         var ray = Camera.main.ScreenPointToRay(target);
-        /*RaycastHit hit;
-        var t = Physics.Raycast(ray, out hit, distance) ? null : hit.collider.gameObject;*/
-        return (from i in ElectricalCircuit.Instance.RealElements let objRect = i.GetComponent<Collider>().bounds where objRect.IntersectRay(ray) select i.gameObject).FirstOrDefault();
-        //var raycastedObject = hit.collider.gameObject;
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, distance))
+        {
+            Debug.Log(hit.collider.gameObject.name);
+            var hitObject = hit.collider.gameObject;
+            if(hitObject.GetComponent<ElementController>())
+            {
+                Debug.Log("We have the controller");
+                return hitObject.GetComponent<ElementController>();
+            }
+        }
+        return null;
     }
+
+    #endregion
+
 }

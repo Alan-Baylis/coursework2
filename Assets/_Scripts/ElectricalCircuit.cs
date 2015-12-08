@@ -19,7 +19,7 @@ public class ElectricalCircuit : MonoBehaviour
     public List<ElementController> RealElements { 
         get
         {// elements.Exists(y => x.Id == y.Id) = true
-            return FindObjectsOfType<ElementController>().Where(x => true).ToList();
+            return FindObjectsOfType<ElementController>().ToList();
         }
     }
     protected const float SecondsToDrag = 0.8f;

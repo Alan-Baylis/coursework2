@@ -139,8 +139,7 @@ public static class HelperClass
         var tangent = Mathf.Clamp((-1)*(startPoint.x - endPoint.x), -100, 100);
         var startTangent = new Vector2(startPoint.x + tangent, startPoint.y);
         var endTangent = new Vector2(endPoint.x - tangent, endPoint.y);
-        Handles.DrawBezier(startPoint, endPoint, startTangent, endTangent, new Color(0f, 0.1f, 0.4f, 0.6f), null,
-            curveThickness);
+        //Handles.DrawBezier(startPoint, endPoint, startTangent, endTangent, new Color(0f, 0.1f, 0.4f, 0.6f), null, curveThickness);
     }
 
 
