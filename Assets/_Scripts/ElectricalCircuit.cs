@@ -57,7 +57,7 @@ public class ElectricalCircuit : MonoBehaviour
     {
         var type = element.GetType().ToString();
         type = type.ToLower();
-        var gameTemp = Instantiate(ResourcesManager.Instance.entries.FirstOrDefault<ResourcesManager.Entry>(x => x.name == type).prefab);
+        var gameTemp = Instantiate(ResourcesManager.Instance.entries.FirstOrDefault<ResourcesManager.StringGameObject>(x => x.name == type).prefab);
         var gameTempController = gameTemp.GetComponentInChildren<ElementController>();
         gameTemp.transform.position = new Vector3(0, 0, 0);
         gameTempController.Id = element.Id;

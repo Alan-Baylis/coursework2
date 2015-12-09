@@ -1,17 +1,18 @@
-﻿using UnityEngine;
-using System.Collections;
-using UnityEditor;
+﻿using System;
+using UnityEngine;
 using System.Collections.Generic;
 
 public class ResourcesManager : MonoBehaviour
 {
     public static ResourcesManager Instance { get; protected set; }
-    public struct Entry
+    [Serializable]
+    public class StringGameObject
     {
-        public string name;
-        public GameObject prefab;
+        public string name = "";
+        public GameObject prefab = null;
     }
-    public List<Entry> entries = new List<Entry>();
+
+    public List<StringGameObject> entries = new List<StringGameObject>();
 
     void Awake()
     {
