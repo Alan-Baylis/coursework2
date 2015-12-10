@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngineInternal;
 
 /// <summary>
 ///     Works as a collection of elements conencted together.
@@ -14,7 +13,7 @@ public class ElectricalCircuit : MonoBehaviour
     }
 
     protected GameObject inspector;
-    public List<AbstractElement> AllElements { get { return AbstractElement.allDrawableBases.OfType<AbstractElement>().ToList<AbstractElement>(); } }
+    public List<AbstractElement> AllElements { get { return NodeDrawableBase.allDrawableBases.OfType<AbstractElement>().ToList<AbstractElement>(); } }
     public List<Battery> Batteries { get { return AllElements.OfType<Battery>().ToList(); } }
     public List<ElementController> realElements = new List<ElementController>();
 
@@ -34,7 +33,7 @@ public class ElectricalCircuit : MonoBehaviour
         if (timer < SecondsToDrag)
         {
             Debug.Log("In Connect Mode");
-            //currentMode = ElementController.ElementMode.Connect;
+            //currentMode = ElementController.InputMode.Connect;
         }
         else
         {
@@ -45,19 +44,19 @@ public class ElectricalCircuit : MonoBehaviour
 
     public ElementController GetControllerByElement(AbstractElement element)
     {
-        return (from element2 in realElements where element2.Id == element.Id select element2).ToList().FirstOrDefault<ElementController>();
+        return (from element2 in realElements where element2.Id == element.Id select element2).ToList().FirstOrDefault();
     }
 
     public AbstractElement GetElementByController(ElementController controller)
     {
-        return (from element in AllElements where element.Id == controller.Id select element).ToList().FirstOrDefault<AbstractElement>();
+        return (from element in AllElements where element.Id == controller.Id select element).ToList().FirstOrDefault();
     }
 
     public void CreatePairForElement(AbstractElement element)
     {
         var type = element.GetType().ToString();
         Debug.LogFormat("Type is {0}", type);
-        var gameTemp = Instantiate(ResourcesManager.Instance.entries.FirstOrDefault<ResourcesManager.StringGameObject>(x => x.name.ToLower() == type.ToLower()).prefab);
+        var gameTemp = Instantiate(ResourcesManager.Instance.entries.FirstOrDefault(x => x.name.ToLower() == type.ToLower()).prefab);
         var gameTempController = gameTemp.GetComponentInChildren<ElementController>();
         gameTemp.transform.position = new Vector3(0, 0, 4);
         gameTempController.Id = element.Id;
@@ -69,7 +68,7 @@ public class ElectricalCircuit : MonoBehaviour
         if (firstOrDefault != null)
             firstOrDefault.Connect(AllElements.FirstOrDefault(x => x.Id == id2));
 
-        Batteries.FirstOrDefault<Battery>().GiveProperties();
+        Batteries.FirstOrDefault().GiveProperties();
     }
 
     public void AddBattery()

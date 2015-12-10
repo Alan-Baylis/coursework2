@@ -9,6 +9,7 @@ public class PropertiesEditorController : MonoBehaviour {
 
     const string FieldObjectsPrefix = "Field";
 
+    [Serializable]
     public class MyUiEditField
     {
         public Transform Parent { get; protected set; }
@@ -69,6 +70,7 @@ public class PropertiesEditorController : MonoBehaviour {
 	// Use this for initialization
     [UsedImplicitly]
     void Start () {
+        if(fields.Count != 0) return;
         for (var i = 0; i < 5; ++i)
         {
             Transform gameObjectOfFieldParent;
@@ -86,17 +88,25 @@ public class PropertiesEditorController : MonoBehaviour {
             fields.Add(field);
             Debug.LogFormat("{0} obtained", field);
         }
-        ResetPlaceholders();
 	}
 
-    public void ResetPlaceholders(string s = "no element")
+    public void SetActive(bool value)
     {
-        fields.ForEach(x => x.Placeholder = s);
+        ForEach(x =>
+        {
+            x.inputField.interactable = value;
+        });
     }
-	
-	// Update is called once per frame
-    [UsedImplicitly]
-    void Update () {
-	
-	}
+
+    public void ForEach(Action <MyUiEditField> action)
+    {
+        fields.ForEach(action);
+    }
+
+    public void SetElectricProperties(ElectricProperties props)
+    {
+        fields[0].Text = Math.Round(props.Amperage, 4).ToString();
+        fields[1].Text = Math.Round(props.Current, 4).ToString();
+        fields[2].Text = Math.Round(props.Resistance, 4).ToString();
+    }
 }

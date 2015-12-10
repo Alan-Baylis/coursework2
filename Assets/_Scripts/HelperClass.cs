@@ -144,6 +144,11 @@ public static class HelperClass
         Gizmos.DrawLine(startPoint, endPoint);
     }
 
+    public static int NextInRangeOrFirst(this int a, int begin, int end)
+    {
+        return a == end - 1 ? begin : a + 1;
+    }
+
 
     #region resistivity table
 

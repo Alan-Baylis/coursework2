@@ -1,11 +1,11 @@
-﻿using System;
-using System.Linq;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using UnityEngine;
 
 public class InputManager : MonoBehaviour
 {
-    public enum ElementMode
+    public delegate void ChangeInputModeEvent();
+
+    public enum InputMode
     {
         Idle,
         Properties,
@@ -14,11 +14,11 @@ public class InputManager : MonoBehaviour
     }
 
     public float clickTime = 0.3f;
-    public ElementMode currentMode;
+    public InputMode currentMode;
     private bool isActive;
     public bool isPressed;
-    public float timer;
     private ElementController newElement;
+    public float timer;
 
     private ElementController NewElement
     {
@@ -32,12 +32,7 @@ public class InputManager : MonoBehaviour
 
     public static InputManager Instance { get; private set; }
     public ElementController CurrentElement { get; protected set; }
-
-    protected void SetMode(ElementMode mode)
-    {
-        Debug.LogFormat("Setting mode to {0}", mode.ToString());
-        currentMode = mode;
-    }
+    public PropertiesEditorController propertiesEditor;
 
     public bool IsActive
     {
@@ -57,6 +52,52 @@ public class InputManager : MonoBehaviour
 
     public bool IsUserControll { get; set; }
     public int LockerCount { get; private set; }
+    public event ChangeInputModeEvent OnIdleEvent = Instance.HandleOnIdle;
+    public event ChangeInputModeEvent OnPropertiesEvent = Instance.HandleOnProperties;
+    public event ChangeInputModeEvent OnDragEvent = Instance.HandleOnDrag;
+    public event ChangeInputModeEvent OnConnectEvent = Instance.HandleOnConnect;
+
+    protected void SetMode(InputMode mode)
+    {
+        Debug.LogFormat("Setting mode to {0}", mode.ToString());
+        currentMode = mode;
+        switch (currentMode)
+        {
+            case InputMode.Idle:
+                OnIdleEvent();
+                break;
+            case InputMode.Properties:
+                OnPropertiesEvent();
+                break;
+            case InputMode.Connect:
+                OnConnectEvent();
+                break;
+            case InputMode.Drag:
+                OnDragEvent();
+                break;
+        }
+    }
+
+    private void HandleOnDrag()
+    {
+    }
+
+    private void HandleOnConnect()
+    {
+    }
+
+    private void HandleOnProperties()
+    {
+        propertiesEditor.SetElectricProperties(ElectricalCircuit.Instance.GetElementByController(CurrentElement).Properties);
+        propertiesEditor.SetActive(true);
+    }
+
+    private void HandleOnIdle()
+    {
+        propertiesEditor.ForEach(x => x.Text = "");
+        propertiesEditor.SetActive(false);
+    }
+
     // ------------------------------------------------------------------------
     [UsedImplicitly]
     private void Awake()
@@ -64,7 +105,16 @@ public class InputManager : MonoBehaviour
         Instance = this;
         IsActive = true;
         IsUserControll = true;
-        SetMode(ElementMode.Idle);
+        OnIdleEvent += HandleOnIdle;
+        OnPropertiesEvent += HandleOnProperties;
+        OnConnectEvent += HandleOnConnect;
+        OnDragEvent += HandleOnDrag;
+    }
+
+    [UsedImplicitly]
+    private void Start()
+    {
+        SetMode(InputMode.Idle);
     }
 
     [UsedImplicitly]
@@ -72,25 +122,27 @@ public class InputManager : MonoBehaviour
     {
         switch (currentMode)
         {
-            case ElementMode.Idle:
+            case InputMode.Idle:
                 break;
-            case ElementMode.Properties:
-
+            case InputMode.Properties:
                 break;
-            case ElementMode.Connect:
+            case InputMode.Connect:
                 if (CurrentElement != null)
                 {
                     HelperClass.DrawConnection(CurrentElement.outPoint.position,
                         Camera.main.ScreenToWorldPoint(new Vector2(Input.mousePosition.x, Input.mousePosition.y)));
                 }
                 break;
-            case ElementMode.Drag:
+            case InputMode.Drag:
                 if (isPressed)
+                {
                     CurrentElement.transform.position =
-                        Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, CurrentElement.transform.position.z));
+                        Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y,
+                            CurrentElement.transform.position.z));
+                }
                 else
                 {
-                    SetMode(ElementMode.Properties);
+                    SetMode(InputMode.Properties);
                 }
                 break;
         }
@@ -138,9 +190,9 @@ public class InputManager : MonoBehaviour
             timer = 0;
             NewElement = GetObjectFromCursor();
         }
-        if (timer > clickTime && NewElement != null && isPressed && currentMode == ElementMode.Properties)
+        if (timer > clickTime && NewElement != null && isPressed && currentMode == InputMode.Properties)
         {
-            SetMode(ElementMode.Drag);
+            SetMode(InputMode.Drag);
         }
         if (!Input.GetMouseButtonUp(0) && !Input.GetMouseButtonUp(2))
         {
@@ -165,47 +217,44 @@ public class InputManager : MonoBehaviour
         //Handle the press on an object
         switch (currentMode)
         {
-            case ElementMode.Idle:
+            case InputMode.Idle:
                 if (objectBase != null)
                 {
-                    SetMode(ElementMode.Properties);
+                    SetMode(InputMode.Properties);
                     CurrentElement = objectBase;
                 }
                 break;
-            case ElementMode.Properties:
+            case InputMode.Properties:
                 if (objectBase == null)
                 {
-                    SetMode(ElementMode.Idle);
+                    SetMode(InputMode.Idle);
                     CurrentElement = null;
                 }
                 else
                 {
                     if (objectBase == CurrentElement)
                     {
-                        SetMode(ElementMode.Connect);
+                        SetMode(InputMode.Connect);
                         CurrentElement = objectBase;
                     }
                     CurrentElement = objectBase;
                 }
                 break;
-            case ElementMode.Drag:
-                /*if (isPressed)
-                    CurrentElement.transform.position =
-                        Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 4));*/
+            case InputMode.Drag:
                 if (objectBase == null)
                 {
-                    SetMode(ElementMode.Idle);
+                    SetMode(InputMode.Idle);
                     CurrentElement = null;
                 }
                 else
                 {
-                    SetMode(ElementMode.Properties);
+                    SetMode(InputMode.Properties);
                 }
                 break;
-            case ElementMode.Connect:
+            case InputMode.Connect:
                 if (objectBase == null)
                 {
-                    SetMode(ElementMode.Properties);
+                    SetMode(InputMode.Properties);
                 }
                 else
                 {
@@ -213,13 +262,10 @@ public class InputManager : MonoBehaviour
                     {
                         ElectricalCircuit.Instance.Connect(CurrentElement.Id, objectBase.Id);
                     }
-                    currentMode = ElementMode.Idle;
+                    currentMode = InputMode.Idle;
                     CurrentElement = null;
                 }
                 break;
-            /*default:
-                currentMode = ElementMode.Idle;
-            break;*/
         }
     }
 
@@ -242,11 +288,13 @@ public class InputManager : MonoBehaviour
     {
         var ray = Camera.main.ScreenPointToRay(target);
         RaycastHit hit;
+        // ReSharper disable once InvertIf
         if (Physics.Raycast(ray, out hit, distance))
         {
             Debug.Log(hit.collider.gameObject.name);
             var hitObject = hit.collider.gameObject;
-            if(hitObject.GetComponent<ElementController>())
+            // ReSharper disable once InvertIf
+            if (hitObject.GetComponent<ElementController>())
             {
                 Debug.Log("We have the controller");
                 return hitObject.GetComponent<ElementController>();
@@ -256,5 +304,4 @@ public class InputManager : MonoBehaviour
     }
 
     #endregion
-
 }

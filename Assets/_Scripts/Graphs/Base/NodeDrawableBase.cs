@@ -87,7 +87,7 @@ public abstract class NodeDrawableBase
 	/// </summary>
 	public List<T> GetSpecificDrawableList<T> () where T: NodeDrawableBase
 	{
-		var result = allDrawableBases.OfType<T> ().Select (drawableBase => drawableBase).ToList ();
+		var result = allDrawableBases.OfType<T> ().ToList ();
 		return result;
 	}
 }

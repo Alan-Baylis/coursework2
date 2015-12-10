@@ -16,9 +16,5 @@ public class ElementController : MonoBehaviour
 
     void Start()
     {
-        if (inPoint == null)
-            inPoint = transform.FindChild(PointsParentName).FindChild(InPointName);
-        if (outPoint == null)
-            outPoint = transform.FindChild(PointsParentName).FindChild(OutPointName);
     }
 }
