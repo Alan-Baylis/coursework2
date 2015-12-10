@@ -56,10 +56,10 @@ public class ElectricalCircuit : MonoBehaviour
     public void CreatePairForElement(AbstractElement element)
     {
         var type = element.GetType().ToString();
-        type = type.ToLower();
-        var gameTemp = Instantiate(ResourcesManager.Instance.entries.FirstOrDefault<ResourcesManager.StringGameObject>(x => x.name == type).prefab);
+        Debug.LogFormat("Type is {0}", type);
+        var gameTemp = Instantiate(ResourcesManager.Instance.entries.FirstOrDefault<ResourcesManager.StringGameObject>(x => x.name.ToLower() == type.ToLower()).prefab);
         var gameTempController = gameTemp.GetComponentInChildren<ElementController>();
-        gameTemp.transform.position = new Vector3(0, 0, 0);
+        gameTemp.transform.position = new Vector3(0, 0, 4);
         gameTempController.Id = element.Id;
     }
 
