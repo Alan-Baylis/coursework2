@@ -47,7 +47,7 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
     /// </summary>
     public virtual string Name
     {
-        get { return string.Format("{0}({1})", GetType(), Id); } // string.Format("{0}({1})", GetType().ToString(), Id)
+        get { return string.Format("{0}({1})", GetType(), Id); } // string.Format("{0}({1})", GetType().ToString(), ElementName)
     }
 
     public virtual bool Connect(AbstractElement other)

@@ -67,7 +67,10 @@ public class PropertiesEditorController : MonoBehaviour {
 
     public List<MyUiEditField> fields = new List<MyUiEditField>();
 
-	// Use this for initialization
+    public Text statusText;
+    public Text elementName;
+
+    // Use this for initialization
     [UsedImplicitly]
     void Start () {
         if(fields.Count != 0) return;
@@ -90,7 +93,7 @@ public class PropertiesEditorController : MonoBehaviour {
         }
 	}
 
-    public void SetActive(bool value)
+    public void SetButtonsActive(bool value)
     {
         ForEach(x =>
         {

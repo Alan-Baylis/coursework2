@@ -6,11 +6,11 @@ public abstract class NodeChildBase : NodeDrawableBase
 
     public const int IndexOfNothing = -1;
 
-//    public override string Id
+//    public override string ElementName
 //    {
 //        get
 //        {
-//            return Parent.Id + HierarchyDelimiter + Parent.Children.IndexOf(this);
+//            return Parent.ElementName + HierarchyDelimiter + Parent.Children.IndexOf(this);
 //        }
 //    }
 

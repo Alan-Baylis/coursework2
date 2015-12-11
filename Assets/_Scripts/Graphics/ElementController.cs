@@ -1,19 +1,18 @@
-﻿using UnityEngine;
+﻿using JetBrains.Annotations;
+using UnityEngine;
 
 public class ElementController : MonoBehaviour
 {
-    protected const string InPointName = "inPoint";
-    protected const string OutPointName = "outPoint";
-    protected const string PointsParentName = "points";
     protected const float ElementsZ = 4;
-    public Transform outPoint;
-    public Transform inPoint;
-    public string Id { get; set; }
+    public string ElementName { get; set; }
+
+    [UsedImplicitly]
     void Awake()
     {
         ElectricalCircuit.Instance.realElements.Add(this);
     }
 
+    [UsedImplicitly]
     void Start()
     {
     }

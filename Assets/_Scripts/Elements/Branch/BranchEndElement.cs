@@ -15,7 +15,7 @@ public sealed class BranchEndElement : AbstractElement {
 
     private BranchEndElement() : base(null)
     {
-        //Id = BranchEndId;
+        //ElementName = BranchEndId;
     }
 
     public override Rect DragableRect

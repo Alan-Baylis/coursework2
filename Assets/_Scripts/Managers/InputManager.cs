@@ -3,7 +3,11 @@ using UnityEngine;
 
 public class InputManager : MonoBehaviour
 {
-    public delegate void ChangeInputModeEvent();
+    public delegate void OnInputModeEvent();
+
+    public delegate void WhenInputModeEvent(ElementController controller);
+
+    public delegate void UpdateInputOnInputModeEvent();
 
     public enum InputMode
     {
@@ -13,11 +17,13 @@ public class InputManager : MonoBehaviour
         Connect
     }
 
-    public float clickTime = 0.3f;
+    public float clickTime = 0.7f;
     public InputMode currentMode;
     private bool isActive;
     public bool isPressed;
     private ElementController newElement;
+    private ElementController currentElement;
+    public PropertiesEditorController propertiesEditor;
     public float timer;
 
     private ElementController NewElement
@@ -31,8 +37,15 @@ public class InputManager : MonoBehaviour
     }
 
     public static InputManager Instance { get; private set; }
-    public ElementController CurrentElement { get; protected set; }
-    public PropertiesEditorController propertiesEditor;
+    public ElementController CurrentElement
+    {
+        get { return currentElement; }
+        set
+        {
+            Debug.LogFormat("Setting CurrentElement to {0}", value);
+            currentElement = value;
+        }
+    }
 
     public bool IsActive
     {
@@ -52,10 +65,18 @@ public class InputManager : MonoBehaviour
 
     public bool IsUserControll { get; set; }
     public int LockerCount { get; private set; }
-    public event ChangeInputModeEvent OnIdleEvent = Instance.HandleOnIdle;
-    public event ChangeInputModeEvent OnPropertiesEvent = Instance.HandleOnProperties;
-    public event ChangeInputModeEvent OnDragEvent = Instance.HandleOnDrag;
-    public event ChangeInputModeEvent OnConnectEvent = Instance.HandleOnConnect;
+    public event OnInputModeEvent OnChangeToIdleEvent;
+    public event OnInputModeEvent OnChangeToPropertiesEvent;
+    public event OnInputModeEvent OnChangeToDragEvent;
+    public event OnInputModeEvent OnChangeToConnectEvent;
+    public event WhenInputModeEvent OnClickWhenIdle;
+    public event WhenInputModeEvent OnClickWhenProperties;
+    public event WhenInputModeEvent OnClickWhenDrag;
+    public event WhenInputModeEvent OnClickWhenConnect;
+    public event UpdateInputOnInputModeEvent UpdateInIdle;
+    public event UpdateInputOnInputModeEvent UpdateInProperties;
+    public event UpdateInputOnInputModeEvent UpdateInDrag;
+    public event UpdateInputOnInputModeEvent UpdateInConnect;
 
     protected void SetMode(InputMode mode)
     {
@@ -64,38 +85,44 @@ public class InputManager : MonoBehaviour
         switch (currentMode)
         {
             case InputMode.Idle:
-                OnIdleEvent();
+                if (OnChangeToIdleEvent != null) OnChangeToIdleEvent();
                 break;
             case InputMode.Properties:
-                OnPropertiesEvent();
+                if (OnChangeToPropertiesEvent != null) OnChangeToPropertiesEvent();
                 break;
             case InputMode.Connect:
-                OnConnectEvent();
+                if (OnChangeToConnectEvent != null) OnChangeToConnectEvent();
                 break;
             case InputMode.Drag:
-                OnDragEvent();
+                if (OnChangeToDragEvent != null) OnChangeToDragEvent();
                 break;
         }
     }
 
-    private void HandleOnDrag()
+    private void HandleOnChangeToDrag()
     {
+        propertiesEditor.statusText.text = "Dragging";
     }
 
-    private void HandleOnConnect()
+    private void HandleOnChangeToConnect()
     {
+        propertiesEditor.statusText.text = "Connecting";
     }
 
-    private void HandleOnProperties()
+    private void HandleOnChangeToProperties()
     {
         propertiesEditor.SetElectricProperties(ElectricalCircuit.Instance.GetElementByController(CurrentElement).Properties);
-        propertiesEditor.SetActive(true);
+        propertiesEditor.SetButtonsActive(true);
+        propertiesEditor.statusText.text = "Editing properties";
+        propertiesEditor.elementName.text = CurrentElement.ElementName;
     }
 
-    private void HandleOnIdle()
+    private void HandleOnChangeToIdle()
     {
+        propertiesEditor.elementName.text = "";
+        propertiesEditor.SetButtonsActive(false);
         propertiesEditor.ForEach(x => x.Text = "");
-        propertiesEditor.SetActive(false);
+        propertiesEditor.statusText.text = "";
     }
 
     // ------------------------------------------------------------------------
@@ -105,10 +132,52 @@ public class InputManager : MonoBehaviour
         Instance = this;
         IsActive = true;
         IsUserControll = true;
-        OnIdleEvent += HandleOnIdle;
-        OnPropertiesEvent += HandleOnProperties;
-        OnConnectEvent += HandleOnConnect;
-        OnDragEvent += HandleOnDrag;
+        OnChangeToIdleEvent += HandleOnChangeToIdle;
+        OnChangeToPropertiesEvent += HandleOnChangeToProperties;
+        OnChangeToConnectEvent += HandleOnChangeToConnect;
+        OnChangeToDragEvent += HandleOnChangeToDrag;
+
+        OnClickWhenIdle += HandleOnClickWhenIdle;
+        OnClickWhenProperties += HandleOnClickWhenProperties;
+        OnClickWhenDrag += HandleOnClickWhenDrag;
+        OnClickWhenConnect += HandleOnClickWhenConnect;
+
+        UpdateInIdle += HandleUpdateInIdle;
+        UpdateInProperties += HandleUpdateInProperties;
+        UpdateInDrag += HandleUpdateInDrag;
+        UpdateInConnect += HandleUpdateInConnect;
+    }
+
+    private void HandleUpdateInConnect()
+    {
+        if (CurrentElement != null)
+        {
+            HelperClass.DrawConnection(CurrentElement.transform.position,
+                Camera.main.ScreenToWorldPoint(new Vector2(Input.mousePosition.x, Input.mousePosition.y)));
+        }
+    }
+
+    private void HandleUpdateInDrag()
+    {
+        if (isPressed)
+        {
+            CurrentElement.transform.position =
+                Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y,
+                    CurrentElement.transform.position.z));
+        }
+        else
+        {
+            Debug.LogError("No current element to drag.");
+            SetMode(InputMode.Properties);
+        }
+    }
+
+    private void HandleUpdateInProperties()
+    {
+    }
+
+    private void HandleUpdateInIdle()
+    {
     }
 
     [UsedImplicitly]
@@ -123,27 +192,36 @@ public class InputManager : MonoBehaviour
         switch (currentMode)
         {
             case InputMode.Idle:
+                if (UpdateInIdle != null) UpdateInIdle();
                 break;
             case InputMode.Properties:
+                if (UpdateInProperties != null) UpdateInProperties();
                 break;
             case InputMode.Connect:
-                if (CurrentElement != null)
-                {
-                    HelperClass.DrawConnection(CurrentElement.outPoint.position,
-                        Camera.main.ScreenToWorldPoint(new Vector2(Input.mousePosition.x, Input.mousePosition.y)));
-                }
+                if (UpdateInConnect != null) UpdateInConnect();
                 break;
             case InputMode.Drag:
-                if (isPressed)
-                {
-                    CurrentElement.transform.position =
-                        Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y,
-                            CurrentElement.transform.position.z));
-                }
-                else
-                {
-                    SetMode(InputMode.Properties);
-                }
+                if (UpdateInDrag != null) UpdateInDrag();
+                break;
+        }
+    }
+
+    private void HandleClick(ElementController controller)
+    {
+        Debug.LogFormat("NewElement {0} null", (controller == null) ? "==" : "!=");
+        switch (currentMode)
+        {
+            case InputMode.Idle:
+                if (OnClickWhenIdle != null) OnClickWhenIdle(controller);
+                break;
+            case InputMode.Properties:
+                if (OnClickWhenProperties != null) OnClickWhenProperties(controller);
+                break;
+            case InputMode.Drag:
+                if (OnClickWhenDrag != null) OnClickWhenDrag(controller);
+                break;
+            case InputMode.Connect:
+                if (OnClickWhenConnect != null) OnClickWhenConnect(controller);
                 break;
         }
     }
@@ -190,8 +268,9 @@ public class InputManager : MonoBehaviour
             timer = 0;
             NewElement = GetObjectFromCursor();
         }
-        if (timer > clickTime && NewElement != null && isPressed && currentMode == InputMode.Properties)
+        if (timer > clickTime && NewElement.IsNotNull() && isPressed && currentMode == InputMode.Properties)
         {
+            Debug.Log("It is in drag mode now!!!");
             SetMode(InputMode.Drag);
         }
         if (!Input.GetMouseButtonUp(0) && !Input.GetMouseButtonUp(2))
@@ -206,66 +285,72 @@ public class InputManager : MonoBehaviour
     public void PressRightButton()
     {
         if (!Input.GetMouseButtonUp(1)) return;
-        Debug.Log("Pressed RMB");
-        // put all objects down
+        SetMode(InputMode.Idle);
+        isPressed = false;
     }
 
     // ------------------------------------------------------------------------
-    private void HandleClick(ElementController objectBase)
+    
+
+    private void HandleOnClickWhenIdle(ElementController controller)
     {
-        Debug.LogFormat("NewElement == null --> {0}", objectBase == null);
-        //Handle the press on an object
-        switch (currentMode)
+        if (controller == null) return;
+
+        SetMode(InputMode.Properties);
+        CurrentElement = controller;
+        isPressed = false;
+    }
+
+    private void HandleOnClickWhenProperties(ElementController controller)
+    {
+        if (controller == null)
         {
-            case InputMode.Idle:
-                if (objectBase != null)
-                {
-                    SetMode(InputMode.Properties);
-                    CurrentElement = objectBase;
-                }
-                break;
-            case InputMode.Properties:
-                if (objectBase == null)
-                {
-                    SetMode(InputMode.Idle);
-                    CurrentElement = null;
-                }
-                else
-                {
-                    if (objectBase == CurrentElement)
-                    {
-                        SetMode(InputMode.Connect);
-                        CurrentElement = objectBase;
-                    }
-                    CurrentElement = objectBase;
-                }
-                break;
-            case InputMode.Drag:
-                if (objectBase == null)
-                {
-                    SetMode(InputMode.Idle);
-                    CurrentElement = null;
-                }
-                else
-                {
-                    SetMode(InputMode.Properties);
-                }
-                break;
-            case InputMode.Connect:
-                if (objectBase == null)
-                {
-                    SetMode(InputMode.Properties);
-                }
-                else
-                {
-                    if (CurrentElement != null && CurrentElement != objectBase)
-                    {
-                        ElectricalCircuit.Instance.Connect(CurrentElement.Id, objectBase.Id);
-                    }
-                    currentMode = InputMode.Idle;
-                    CurrentElement = null;
-                }
-                break;
+            SetMode(InputMode.Idle);
+            CurrentElement = null;
+            isPressed = false;
+        }
+        else
+        {
+            if (controller == CurrentElement)
+            {
+                SetMode(InputMode.Connect);
+            }
+            CurrentElement = controller;
+            isPressed = false;
+        }
+    }
+
+    private void HandleOnClickWhenDrag(ElementController controller)
+    {
+        if (controller == null)
+        {
+            SetMode(InputMode.Idle);
+            CurrentElement = null;
+            isPressed = false;
+        }
+        else
+        {
+            SetMode(InputMode.Properties);
+            isPressed = false;
+        }
+    }
+
+    private void HandleOnClickWhenConnect(ElementController controller)
+    {
+        if (controller == null)
+        {
+            SetMode(InputMode.Properties);
+            isPressed = false;
+        }
+        else
+        {
+            if (CurrentElement != null && CurrentElement != controller)
+            {
+                ElectricalCircuit.Instance.Connect(CurrentElement.ElementName, controller.ElementName);
+            }
+            SetMode(InputMode.Idle);
+            CurrentElement = null;
+            isPressed = false;
         }
     }
 
@@ -288,19 +373,12 @@ public class InputManager : MonoBehaviour
     {
         var ray = Camera.main.ScreenPointToRay(target);
         RaycastHit hit;
-        // ReSharper disable once InvertIf
-        if (Physics.Raycast(ray, out hit, distance))
-        {
-            Debug.Log(hit.collider.gameObject.name);
-            var hitObject = hit.collider.gameObject;
-            // ReSharper disable once InvertIf
-            if (hitObject.GetComponent<ElementController>())
-            {
-                Debug.Log("We have the controller");
-                return hitObject.GetComponent<ElementController>();
-            }
-        }
-        return null;
+        if (!Physics.Raycast(ray, out hit, distance)) return null;
+        //Debug.Log(hit.collider.gameObject.name);
+        var hitObject = hit.collider.gameObject;
+        if (!hitObject.GetComponent<ElementController>()) return null;
+        Debug.Log("We have the controller!");
+        return hitObject.GetComponent<ElementController>();
     }
 
     #endregion

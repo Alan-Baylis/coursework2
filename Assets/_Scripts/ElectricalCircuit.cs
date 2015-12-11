@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using UnityEngine;
 
 /// <summary>
@@ -17,58 +19,74 @@ public class ElectricalCircuit : MonoBehaviour
     public List<Battery> Batteries { get { return AllElements.OfType<Battery>().ToList(); } }
     public List<ElementController> realElements = new List<ElementController>();
 
+    [UsedImplicitly]
     void Awake()
     {
         Instance = this;
     }
 
+    [UsedImplicitly]
     void Update()
     {
-        /*var timer = 0f;
-        while (!Input.GetMouseButton(0))
-        {
-            Debug.LogFormat("timer = {0}", timer);
-            timer += Time.deltaTime;
-        }
-        if (timer < SecondsToDrag)
-        {
-            Debug.Log("In Connect Mode");
-            //currentMode = ElementController.InputMode.Connect;
-        }
-        else
-        {
-            Debug.Log("In Drag Mode");
-            //transform.parent.position = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, ElementsZ));
-        }*/
+        
     }
 
     public ElementController GetControllerByElement(AbstractElement element)
     {
-        return (from element2 in realElements where element2.Id == element.Id select element2).ToList().FirstOrDefault();
+        var r =
+            (from element2 in realElements where element2.ElementName == element.Name select element2).ToList()
+                .FirstOrDefault();
+        if (r != null) return r;
+        Debug.LogError("No such object");
+        return null;
     }
 
     public AbstractElement GetElementByController(ElementController controller)
     {
-        return (from element in AllElements where element.Id == controller.Id select element).ToList().FirstOrDefault();
+        var allElements = AllElements;
+        if (allElements == null)
+        {
+            print("All elements == null");
+        }
+        var r =
+            (from element in AllElements where element.Name == controller.ElementName select element).ToList()
+                .FirstOrDefault();
+        if (r != null) return r;
+        Debug.LogError("No such object");
+        return null;
     }
 
     public void CreatePairForElement(AbstractElement element)
     {
         var type = element.GetType().ToString();
         Debug.LogFormat("Type is {0}", type);
-        var gameTemp = Instantiate(ResourcesManager.Instance.entries.FirstOrDefault(x => x.name.ToLower() == type.ToLower()).prefab);
+        var pairElement = ResourcesManager.Instance.entries.FirstOrDefault(x => String.Equals(x.name, type, StringComparison.CurrentCultureIgnoreCase));
+        if (pairElement == null) return;
+
+        var gameTemp = Instantiate(pairElement.prefab);
         var gameTempController = gameTemp.GetComponentInChildren<ElementController>();
         gameTemp.transform.position = new Vector3(0, 0, 4);
-        gameTempController.Id = element.Id;
+        gameTempController.ElementName = element.Name;
     }
 
     public void Connect(string id1, string id2)
     {
-        var firstOrDefault = AllElements.FirstOrDefault(x => x.Id == id1);
-        if (firstOrDefault != null)
-            firstOrDefault.Connect(AllElements.FirstOrDefault(x => x.Id == id2));
+        var first = AllElements.FirstOrDefault(x => x.Id == id1);
+        var second = AllElements.FirstOrDefault(x => x.Id == id2);
+        if (first == null)
+        {
+            Debug.LogError("First element's core not found.");
+            return;
+        }
+        if (second == null)
+        {
+            Debug.LogError("Second element's core not found.");
+            return;
+        }
+        first.Connect(second);
 
-        Batteries.FirstOrDefault().GiveProperties();
+        var battery = Batteries.FirstOrDefault();
+        if (battery != null) battery.GiveProperties();
     }
 
     public void AddBattery()
@@ -94,7 +112,7 @@ public class ElectricalCircuit : MonoBehaviour
 
     public void AddCable()
     {
-        var temp = HelperClass.GetRandomCable();
+        var temp = HelperClass.GetRandomCable(); // todo replace random cable
         CreatePairForElement(temp);
         AllElements.Add(temp);
     }

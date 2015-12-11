@@ -20,7 +20,7 @@ public class NodeJointPoint
 
     /// <summary>
     ///     The Node holding this point.
-    ///     The result is determined by Id.
+    ///     The result is determined by ElementName.
     /// </summary>
     public NodeDrawableBase Parent
     {
@@ -29,7 +29,7 @@ public class NodeJointPoint
 
     /// <summary>
     ///     The point to which this joint is connected.
-    ///     The result is not determined by Id.
+    ///     The result is not determined by ElementName.
     /// </summary>
     public NodeJointPoint Target { get; protected set; }
 
@@ -52,7 +52,7 @@ public class NodeJointPoint
 			Target = null;
             return false;
 		}
-        TargetId = target.Id;
+        TargetId = target.ElementName;
         Target = target.FirstJoint;
         return true;*/
 
@@ -128,7 +128,7 @@ public class NodeJointPoint
         Target = target != null ? target.FirstJoint : null;
         TargetId = target != null ? target.Id : NodeDrawableBase.NothingId;
         ParentId = parent.Id;
-        //Debug.Log("in " + parent + ", ID=" + parent.Id);
+        //Debug.Log("in " + parent + ", ID=" + parent.ElementName);
     }
 
     public NodeJointPoint(NodeDrawableBase parent, NodeBase target = null)

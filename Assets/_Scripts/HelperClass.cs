@@ -38,6 +38,7 @@ public static class HelperClass
 
     public static Cable GetRandomCable(Random random=null)
     {
+        random = random ?? new Random();
         return new Cable("copper", random.Next(1, 5), random.Next(1, 10));
     }
 
@@ -141,7 +142,7 @@ public static class HelperClass
         var startTangent = new Vector2(startPoint.x + tangent, startPoint.y);
         var endTangent = new Vector2(endPoint.x - tangent, endPoint.y);
         //Handles.DrawBezier(startPoint, endPoint, startTangent, endTangent, new Color(0f, 0.1f, 0.4f, 0.6f), null, curveThickness);
-        GL.Begin(GL.LINES);
+//        GL.Begin(GL.LINES);
 
     }
 
@@ -150,6 +151,10 @@ public static class HelperClass
         return a == end - 1 ? begin : a + 1;
     }
 
+    public static bool IsNotNull(this object o)
+    {
+        return o != null;
+    }
 
     #region resistivity table
 

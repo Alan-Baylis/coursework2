@@ -122,7 +122,7 @@ public abstract class NodeBase: NodeDrawableBase
 	public virtual void DrawConnections ()
 	{
 		foreach (var child in Children) {
-			//Debug.Log(string.Format("Length of {0}'s joints:{1}", child.Id, child.joints.Count));
+			//Debug.Log(string.Format("Length of {0}'s joints:{1}", child.ElementName, child.joints.Count));
 			foreach (var point in child.joints) {
 				if (point.TargetId == NothingId)
 					continue;

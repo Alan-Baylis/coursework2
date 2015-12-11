@@ -24,7 +24,7 @@ public abstract class NodeDrawableBase
     public Vector2 Size { get; set; }
     #endregion
     /// <summary>
-	/// Id used to represent that element is not
+	/// ElementName used to represent that element is not
 	/// connected to anything.
 	/// </summary>
 	public const string NothingId = "-1";
@@ -35,7 +35,7 @@ public abstract class NodeDrawableBase
 	public const string StartingId = "0";
 	/// <summary>
 	/// Children need to have ids in form:
-	/// &#60;node Id&#62;&#60;delimiter&#62;&#60;child Id&#62;.
+	/// &#60;node ElementName&#62;&#60;delimiter&#62;&#60;child ElementName&#62;.
 	/// This is the delimiter.
 	/// </summary>
 	public const string HierarchyDelimiter = "->";

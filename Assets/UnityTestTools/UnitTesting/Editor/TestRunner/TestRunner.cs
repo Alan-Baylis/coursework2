@@ -20,7 +20,7 @@ namespace UnityTest
             var idx = m_ResultList.FindIndex(testResult => testResult.Id == resultId);
             if (idx == -1)
             {
-                Debug.LogWarning("Id not found for test: " + resultId);
+                Debug.LogWarning("ElementName not found for test: " + resultId);
                 return null;
             }
             return m_ResultList.ElementAt(idx);
