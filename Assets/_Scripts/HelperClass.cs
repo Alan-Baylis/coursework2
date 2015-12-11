@@ -141,7 +141,8 @@ public static class HelperClass
         var startTangent = new Vector2(startPoint.x + tangent, startPoint.y);
         var endTangent = new Vector2(endPoint.x - tangent, endPoint.y);
         //Handles.DrawBezier(startPoint, endPoint, startTangent, endTangent, new Color(0f, 0.1f, 0.4f, 0.6f), null, curveThickness);
-        Gizmos.DrawLine(startPoint, endPoint);
+        GL.Begin(GL.LINES);
+
     }
 
     public static int NextInRangeOrFirst(this int a, int begin, int end)
