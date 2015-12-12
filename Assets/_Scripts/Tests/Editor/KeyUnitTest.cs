@@ -7,14 +7,13 @@ public class KeyUnitTest {
     [Test]
     public void KeyMakesDifference()
     {
-        var random = new Random();
         var key = new Key(electricProperties: ElectricProperties.CreateFromIR(10, 2));
         var elementsList = new List<AbstractElement>
         {
-            HelperClass.GetRandomBattery(random),
-            HelperClass.GetRandomCable(random),
+            HelperClass.GetRandomBattery(),
+            HelperClass.GetRandomCable(),
             key,
-            HelperClass.GetRandomCable(random)
+            HelperClass.GetRandomCable()
         };
 
         HelperClass.Join(elementsList, 0, 1);

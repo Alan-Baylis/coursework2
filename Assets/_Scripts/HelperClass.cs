@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,6 +15,8 @@ public static class HelperClass
     public delegate void DoSomethingWithElement(AbstractElement element);
 
     public delegate bool CheckFunction(AbstractElement element);
+
+    public static Random myRandom = new Random();
 
     public static string GetReadableList<T>(this List<T> list)
     {
@@ -36,16 +39,14 @@ public static class HelperClass
         all[ind1].Connect(all[ind2]);
     }
 
-    public static Cable GetRandomCable(Random random=null)
+    public static Cable GetRandomCable()
     {
-        random = random ?? new Random();
-        return new Cable("copper", random.Next(1, 5), random.Next(1, 10));
+        return new Cable("copper", myRandom.Next(5000, 50000), myRandom.Next(1, 10));
     }
 
-    public static Battery GetRandomBattery(Random random=null)
+    public static Battery GetRandomBattery()
     {
-        random = random ?? new Random();
-        return new Battery(random.Next(10, 20), random.Next(1, 3));
+        return new Battery(myRandom.Next(10, 20), myRandom.Next(1, 3));
     }
 
     public static string IdRefinition(string id, List<string> ids)
@@ -135,15 +136,24 @@ public static class HelperClass
         }
     }
 
-    public static void DrawConnection(Vector2 startPoint, Vector2 endPoint)
+    public static void DrawConnections(List<Vector3[]> pointPairs)
     {
-        const float curveThickness = 1.5f;
-        var tangent = Mathf.Clamp((-1)*(startPoint.x - endPoint.x), -100, 100);
-        var startTangent = new Vector2(startPoint.x + tangent, startPoint.y);
-        var endTangent = new Vector2(endPoint.x - tangent, endPoint.y);
-        //Handles.DrawBezier(startPoint, endPoint, startTangent, endTangent, new Color(0f, 0.1f, 0.4f, 0.6f), null, curveThickness);
-//        GL.Begin(GL.LINES);
-
+        foreach (var vector2se in pointPairs)
+        {
+            var linesObject = ElectricalCircuit.Instance.LineRenderers[pointPairs.IndexOf(vector2se)];
+            linesObject.SetVertexCount(0);
+            linesObject.SetVertexCount(2);
+            var i = 0;
+        
+            var startPoint = vector2se[0];
+            var endPoint = vector2se[1];
+            const float curveThickness = 1.5f;
+            var tangent = Mathf.Clamp((-1)*(startPoint.x - endPoint.x), -100, 100);
+            var startTangent = new Vector2(startPoint.x + tangent, startPoint.y);
+            var endTangent = new Vector2(endPoint.x - tangent, endPoint.y);
+            linesObject.SetPosition(i++, startPoint);
+            linesObject.SetPosition(i++, endPoint);
+        }
     }
 
     public static int NextInRangeOrFirst(this int a, int begin, int end)

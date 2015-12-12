@@ -118,6 +118,7 @@ public class PropertiesEditorController : MonoBehaviour {
         var amperage = fields[0].Text;
         var element = ElectricalCircuit.Instance.GetElementByController(InputManager.Instance.CurrentElement);
         element.Properties.SetIR(Convert.ToDouble(amperage), element.Properties.Resistance);
+        ElectricalCircuit.Instance.ApplyPhysics();
         SetElectricProperties(element.Properties);
     }
 
@@ -125,7 +126,8 @@ public class PropertiesEditorController : MonoBehaviour {
     {
         var current = fields[1].Text;
         var element = ElectricalCircuit.Instance.GetElementByController(InputManager.Instance.CurrentElement);
-        element.Properties.SetIU(element.Properties.Amperage, Convert.ToDouble(current));
+        element.Properties.SetUR(Convert.ToDouble(current), element.Properties.Resistance);
+        ElectricalCircuit.Instance.ApplyPhysics();
         SetElectricProperties(element.Properties);
     }
 
@@ -134,6 +136,7 @@ public class PropertiesEditorController : MonoBehaviour {
         var resistance = fields[2].Text;
         var element = ElectricalCircuit.Instance.GetElementByController(InputManager.Instance.CurrentElement);
         element.Properties.SetIR(element.Properties.Amperage, Convert.ToDouble(resistance));
+        ElectricalCircuit.Instance.ApplyPhysics();
         SetElectricProperties(element.Properties);
     }
 }

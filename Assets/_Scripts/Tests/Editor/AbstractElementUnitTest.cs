@@ -5,7 +5,6 @@ using UnityEngine;
 [TestFixture]
 public class AbstractElementUnitTest
 {
-    readonly System.Random random = new System.Random();
     [Test]
 	public void ConnectingClosedCircuitWith2Elements ()
 	{
@@ -13,7 +12,7 @@ public class AbstractElementUnitTest
          * (0)---(1)
          *   \___/
          */
-		var cable = HelperClass.GetRandomCable(random);
+		var cable = HelperClass.GetRandomCable();
         var battery = new Battery(5, 2);
 
         cable.Connect(battery);
@@ -30,9 +29,9 @@ public class AbstractElementUnitTest
          * (0)--(1)--(2)
          *   \_______/
          */
-        var cable1 = HelperClass.GetRandomCable(random);
+        var cable1 = HelperClass.GetRandomCable();
         var battery = new Battery(2, 10);
-        var cable2 = HelperClass.GetRandomCable(random);
+        var cable2 = HelperClass.GetRandomCable();
         cable2.Properties.SetUR(2, 3);
 
         cable1.Connect(battery);

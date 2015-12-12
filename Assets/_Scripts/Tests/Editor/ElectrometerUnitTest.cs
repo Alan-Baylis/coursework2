@@ -8,8 +8,7 @@ public class ElectrometerUnitTest {
     [Test]
     public void OhmmeterTest()
     {
-        var random = new Random();
-        var battery = HelperClass.GetRandomBattery(random);
+        var battery = HelperClass.GetRandomBattery();
         var cable1 = new Cable("test_one", 1, 2);
         var cable2 = new Cable("test_one", 1, 2);
         var ohmmeter = new Ohmmeter(2);
@@ -26,8 +25,7 @@ public class ElectrometerUnitTest {
     [Test]
     public void VoltmeterTest()
     {
-        var random = new Random();
-        var battery = HelperClass.GetRandomBattery(random);
+        var battery = HelperClass.GetRandomBattery();
         var cable1 = new Cable("test_one", 1, 2);
         var cable2 = new Cable("test_one", 1, 2);
         var voltmeter = new Voltmeter(2);

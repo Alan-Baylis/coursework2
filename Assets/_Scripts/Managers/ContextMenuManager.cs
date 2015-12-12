@@ -15,9 +15,16 @@ public class ContextMenuManager : MonoBehaviour
         }
     }
 
+    public static ContextMenuManager Instance { get; set; }
+
+    void Awake()
+    {
+        Instance = this;
+    }
+
     void Start()
     {
-        ContextMenuActive = true;
+        ContextMenuActive = false;
     }
 
     void Update()

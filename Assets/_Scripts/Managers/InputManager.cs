@@ -153,7 +153,9 @@ public class InputManager : MonoBehaviour
     {
         Debug.LogFormat("NewElement {0} null", (controller == null) ? "==" : "!=");
         if (controller != null)
+        {
             CurrentElement = controller;
+        }
         switch (currentMode)
         {
             case InputMode.Idle:
@@ -251,8 +253,8 @@ public class InputManager : MonoBehaviour
     {
         if (CurrentElement != null)
         {
-            HelperClass.DrawConnection(CurrentElement.transform.position,
-                Camera.main.ScreenToWorldPoint(new Vector2(Input.mousePosition.x, Input.mousePosition.y)));
+            /*HelperClass.DrawConnection(CurrentElement.transform.position,
+                Camera.main.ScreenToWorldPoint(new Vector2(Input.mousePosition.x, Input.mousePosition.y)));*/
         }
     }
 
@@ -306,6 +308,7 @@ public class InputManager : MonoBehaviour
     private void HandleOnClickWhenDrag(ElementController controller)
     {
         SetMode(InputMode.Properties);
+        ElectricalCircuit.Instance.UpdatePointsOfConnections();
     }
 
     private void HandleOnClickWhenConnect(ElementController controller)
@@ -322,8 +325,6 @@ public class InputManager : MonoBehaviour
                 ElectricalCircuit.Instance.Connect(elementFromWhomToConnect.ElementName, CurrentElement.ElementName);
             }
             SetMode(InputMode.Idle);
-            CurrentElement = null;
-            isPressed = false;
         }
     }
 
@@ -338,8 +339,8 @@ public class InputManager : MonoBehaviour
 
     private void HandleOnChangeToConnect()
     {
-        propertiesEditor.statusText.text = "Connecting";
         elementFromWhomToConnect = CurrentElement;
+        propertiesEditor.statusText.text = string.Format("Connecting {0}...", CurrentElement.ElementName);
     }
 
     private void HandleOnChangeToProperties()
@@ -357,6 +358,8 @@ public class InputManager : MonoBehaviour
         propertiesEditor.SetButtonsActive(false);
         propertiesEditor.ForEach(x => x.Text = "");
         propertiesEditor.statusText.text = "";
+        CurrentElement = null;
+        isPressed = false;
     }
 
     #endregion
