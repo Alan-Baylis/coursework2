@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System.Linq;
+using JetBrains.Annotations;
 using UnityEngine;
 
 public class InputManager : MonoBehaviour
@@ -172,6 +173,13 @@ public class InputManager : MonoBehaviour
         else if (Input.GetKeyUp(KeyCode.E))
         {
             ElectricalCircuit.Instance.AddBranchEnd();
+        }
+        else if (Input.GetKeyUp(KeyCode.K) && ElectricalCircuit.Instance.GetElementByController(CurrentElement) is Key)
+        {
+            var temp = (Key)(ElectricalCircuit.Instance.GetElementByController(CurrentElement));
+            temp.On = !temp.On;
+            CurrentElement.GetComponent<Renderer>().material = temp.On ? ResourcesManager.Instance.keyOnMaterial : ResourcesManager.Instance.keyOffMaterial;
+            ElectricalCircuit.Instance.ApplyPhysics();
         }
         else if (ElectricalCircuit.Instance.GetElementByController(CurrentElement) is Branch)
         {

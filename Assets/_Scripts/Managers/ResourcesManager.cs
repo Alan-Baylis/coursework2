@@ -14,6 +14,9 @@ public class ResourcesManager : MonoBehaviour
 
     public List<StringGameObject> entries = new List<StringGameObject>();
 
+    public Material keyOnMaterial;
+    public Material keyOffMaterial;
+
     void Awake()
     {
         Instance = this;
