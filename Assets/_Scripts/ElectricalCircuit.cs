@@ -46,7 +46,9 @@ public class ElectricalCircuit : MonoBehaviour
     public void UpdatePointsOfConnections()
     {
         var allControllers = realElements;
-        var elementsOfControllers = (from controller in allControllers where GetElementByController(controller) != null select GetElementByController(controller));
+        var elementsOfControllers = (from controller in allControllers
+            where GetElementByController(controller) != null
+            select GetElementByController(controller));
         var pairsOfElements = (from element in elementsOfControllers
             where element.NextElement != null
             select new[] {element, element.NextElement});
@@ -184,6 +186,13 @@ public class ElectricalCircuit : MonoBehaviour
         ContextMenuManager.Instance.ContextMenuActive = false;
     }
 
+    public void AddBranch()
+    {
+        var temp = new Branch();
+        CreatePairForElement(temp);
+        ContextMenuManager.Instance.ContextMenuActive = false;
+    }
+
     private void UpdateLinesCount()
     {
         foreach (var t in LineRenderers)
@@ -195,5 +204,11 @@ public class ElectricalCircuit : MonoBehaviour
             var a = Instantiate(linePrefab);
             a.transform.SetParent(linesObject.transform);
         }
+    }
+
+    public void AddBranchEnd()
+    {
+        var temp = BranchEndElement.BranchEnd;
+        CreatePairForElement(temp);
     }
 }

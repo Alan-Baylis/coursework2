@@ -21,9 +21,11 @@ public class InputManager : MonoBehaviour
     public InputMode currentMode;
     private bool isActive;
     public bool isPressed;
+    public bool addingBranch = false;
+    public bool completingBranch = false;
     private ElementController newElement;
     private ElementController currentElement;
-    private ElementController elementFromWhomToConnect;
+    private ElementController controllerOfElementFromWhomToConnect;
     public PropertiesEditorController propertiesEditor;
     public float timer;
 
@@ -167,6 +169,18 @@ public class InputManager : MonoBehaviour
             CurrentElement.transform.parent.localScale /= 1.5f;
             ElectricalCircuit.Instance.UpdatePointsOfConnections();
         }
+        else if (Input.GetKeyUp(KeyCode.E))
+        {
+            ElectricalCircuit.Instance.AddBranchEnd();
+        }
+        else if (ElectricalCircuit.Instance.GetElementByController(CurrentElement) is Branch)
+        {
+            if (Input.GetKeyUp(KeyCode.B))
+            {
+                addingBranch = true;
+                SetMode(InputMode.Connect);
+            }
+        }
     }
 
     private void HandleClick(ElementController controller)
@@ -191,6 +205,7 @@ public class InputManager : MonoBehaviour
                 if (OnClickWhenConnect != null) OnClickWhenConnect(controller);
                 break;
         }
+        BranchLinesController.Instance.UpdatePointsList();
     }
 
     // ------------------------------------------------------------------------
@@ -261,6 +276,7 @@ public class InputManager : MonoBehaviour
     public void PressRightButton()
     {
         if (!Input.GetMouseButtonUp(1)) return;
+        if(CurrentElement == null) return;
         SetMode(InputMode.Properties);
         isPressed = false;
     }
@@ -333,6 +349,26 @@ public class InputManager : MonoBehaviour
 
     private void HandleOnClickWhenConnect(ElementController controller)
     {
+        if (addingBranch)
+        {
+            var branch = (Branch)(ElectricalCircuit.Instance.GetElementByController(controllerOfElementFromWhomToConnect));
+            var elementWeWannaConnect = ElectricalCircuit.Instance.GetElementByController(CurrentElement);
+            if (branch.Branches.Contains(elementWeWannaConnect))
+            {
+                //what if already connected
+                branch.Branches.Remove(elementWeWannaConnect);
+            }
+            else
+            {
+                //what if we need to connect
+                branch.Branches.Add(elementWeWannaConnect);
+            }
+            BranchLinesController.Instance.UpdatePointsList();
+            addingBranch = false;
+            controllerOfElementFromWhomToConnect = null;
+            SetMode(InputMode.Idle);
+            return;
+        }
         if (controller == null)
         {
             SetMode(InputMode.Properties);
@@ -340,12 +376,13 @@ public class InputManager : MonoBehaviour
         }
         else
         {
-            if (CurrentElement != null && CurrentElement != elementFromWhomToConnect)
+            if (CurrentElement != null && CurrentElement != controllerOfElementFromWhomToConnect)
             {
-                ElectricalCircuit.Instance.Connect(elementFromWhomToConnect.ElementName, CurrentElement.ElementName);
+                ElectricalCircuit.Instance.Connect(controllerOfElementFromWhomToConnect.ElementName, CurrentElement.ElementName);
             }
             SetMode(InputMode.Idle);
         }
+        controllerOfElementFromWhomToConnect = null;
     }
 
     #endregion
@@ -355,11 +392,18 @@ public class InputManager : MonoBehaviour
     private void HandleOnChangeToDrag()
     {
         propertiesEditor.statusText.text = "Dragging";
+        ElectricalCircuit.Instance.UpdatePointsOfConnections();
     }
 
     private void HandleOnChangeToConnect()
     {
-        elementFromWhomToConnect = CurrentElement;
+        if (addingBranch)
+        {
+            propertiesEditor.statusText.text = string.Format("Adding new branch...");
+            controllerOfElementFromWhomToConnect = CurrentElement;
+            return;
+        }
+        controllerOfElementFromWhomToConnect = CurrentElement;
         propertiesEditor.statusText.text = string.Format("Connecting {0}...", CurrentElement.ElementName);
     }
 
@@ -370,6 +414,7 @@ public class InputManager : MonoBehaviour
         propertiesEditor.SetButtonsActive(true);
         propertiesEditor.statusText.text = "Editing properties";
         propertiesEditor.elementName.text = CurrentElement.ElementName;
+        ElectricalCircuit.Instance.UpdatePointsOfConnections();
     }
 
     private void HandleOnChangeToIdle()

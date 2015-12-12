@@ -116,7 +116,7 @@ public class AbstractElementUnitTest
          */
 
         var battery = new Battery(30, 1);
-        var branch = new BranchingElement();
+        var branch = new Branch();
         var el1 = new Cable("test_one", 10, 1);
         var el2 = new Cable("test_one", 10, 1);
         var el3 = new Cable("test_one", 10, 1);

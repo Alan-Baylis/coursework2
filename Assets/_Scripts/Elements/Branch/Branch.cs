@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BranchingElement : AbstractElement
+public class Branch : AbstractElement
 {
-    public BranchingElement() : base(null)
+    public Branch() : base(null)
     {
         Branches = new List<AbstractElement>();
     }

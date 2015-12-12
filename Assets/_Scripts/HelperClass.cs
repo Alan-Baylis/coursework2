@@ -41,7 +41,7 @@ public static class HelperClass
 
     public static Cable GetRandomCable()
     {
-        return new Cable("copper", myRandom.Next(5000, 50000), myRandom.Next(1, 10));
+        return new Cable();
     }
 
     public static Battery GetRandomBattery()
@@ -138,23 +138,23 @@ public static class HelperClass
 
     public static void DrawConnections(List<Vector3[]> pointPairs)
     {
-        foreach (var vector2se in pointPairs)
+        foreach (var pair in pointPairs)
         {
-            var linesObject = ElectricalCircuit.Instance.LineRenderers[pointPairs.IndexOf(vector2se)];
+            var linesObject = ElectricalCircuit.Instance.LineRenderers[pointPairs.IndexOf(pair)];
             linesObject.SetVertexCount(0);
             linesObject.SetVertexCount(2);
-            var i = 0;
-        
-            var startPoint = vector2se[0];
-            var endPoint = vector2se[1];
-            const float curveThickness = 1.5f;
+            var startPoint = pair[0];
+            var endPoint = pair[1];
+            /*const float curveThickness = 1.5f;
             var tangent = Mathf.Clamp((-1)*(startPoint.x - endPoint.x), -100, 100);
             var startTangent = new Vector2(startPoint.x + tangent, startPoint.y);
-            var endTangent = new Vector2(endPoint.x - tangent, endPoint.y);
-            linesObject.SetPosition(i++, startPoint);
-            linesObject.SetPosition(i++, endPoint);
+            var endTangent = new Vector2(endPoint.x - tangent, endPoint.y);*/
+            linesObject.SetPosition(0, startPoint);
+            linesObject.SetPosition(1, endPoint);
         }
     }
+
+    
 
     public static int NextInRangeOrFirst(this int a, int begin, int end)
     {
