@@ -112,4 +112,28 @@ public class PropertiesEditorController : MonoBehaviour {
         fields[1].Text = Math.Round(props.Current, 4).ToString();
         fields[2].Text = Math.Round(props.Resistance, 4).ToString();
     }
+
+    public void ChangeAmperage()
+    {
+        var amperage = fields[0].Text;
+        var element = ElectricalCircuit.Instance.GetElementByController(InputManager.Instance.CurrentElement);
+        element.Properties.SetIR(Convert.ToDouble(amperage), element.Properties.Resistance);
+        SetElectricProperties(element.Properties);
+    }
+
+    public void ChangeCurrent()
+    {
+        var current = fields[1].Text;
+        var element = ElectricalCircuit.Instance.GetElementByController(InputManager.Instance.CurrentElement);
+        element.Properties.SetIU(element.Properties.Amperage, Convert.ToDouble(current));
+        SetElectricProperties(element.Properties);
+    }
+
+    public void ChangeResistance()
+    {
+        var resistance = fields[2].Text;
+        var element = ElectricalCircuit.Instance.GetElementByController(InputManager.Instance.CurrentElement);
+        element.Properties.SetIR(element.Properties.Amperage, Convert.ToDouble(resistance));
+        SetElectricProperties(element.Properties);
+    }
 }

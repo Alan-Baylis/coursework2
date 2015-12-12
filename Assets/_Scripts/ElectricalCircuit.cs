@@ -69,10 +69,11 @@ public class ElectricalCircuit : MonoBehaviour
         gameTempController.ElementName = element.Name;
     }
 
-    public void Connect(string id1, string id2)
+    public void Connect(string name1, string name2)
     {
-        var first = AllElements.FirstOrDefault(x => x.Id == id1);
-        var second = AllElements.FirstOrDefault(x => x.Id == id2);
+        Debug.LogWarning("We are Here");
+        var first = AllElements.FirstOrDefault(x => x.Name == name1);
+        var second = AllElements.FirstOrDefault(x => x.Name == name2);
         if (first == null)
         {
             Debug.LogError("First element's core not found.");
@@ -86,7 +87,14 @@ public class ElectricalCircuit : MonoBehaviour
         first.Connect(second);
 
         var battery = Batteries.FirstOrDefault();
-        if (battery != null) battery.GiveProperties();
+        if (battery != null)
+        {
+            battery.GiveProperties();
+        }
+        else
+        {
+            Debug.LogError("No battery found!");
+        }
     }
 
     public void AddBattery()

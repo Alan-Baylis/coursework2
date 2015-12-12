@@ -54,7 +54,7 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
     {
         /*if (NextElement == null)
         {*/
-        //Debug.Log(string.Format("connecting {0} with {1}, {2}", this, other, other != null));
+        Debug.Log(string.Format("@@@connecting {0} with {1}, {2}", this, other, other != null));
             return (NextElement = other) != null;
         //}
         /*else
@@ -68,10 +68,10 @@ public abstract class AbstractElement : NodeBase, IConnectable<AbstractElement>
         var listOfConnectedElements = NextElement == null ? null : NextElement.GetListOfConnectedElements(this);
         if (listOfConnectedElements == null)
         {
-            //Debug.Log("No connected elements.");
+            Debug.Log("No connected elements.");
             return;
         }
-        //Debug.Log(string.Format("Connected elements: {0}", listOfConnectedElements.GetReadableList()));
+        Debug.Log(string.Format("Connected elements: {0}", listOfConnectedElements.GetReadableList()));
         var batteries = listOfConnectedElements.OfType<Battery>();
         var batteryU = (from battery in batteries select battery.Properties.Current).ToList<double>().Sum();
 
