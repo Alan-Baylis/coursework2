@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class ContextMenuManager : MonoBehaviour
 {
     public GameObject contextMenuPanel;
+    public bool activeOnStart;
 
     public bool ContextMenuActive
     {
@@ -24,7 +25,7 @@ public class ContextMenuManager : MonoBehaviour
 
     void Start()
     {
-        ContextMenuActive = false;
+        ContextMenuActive = activeOnStart;
     }
 
     void Update()

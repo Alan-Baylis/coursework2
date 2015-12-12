@@ -5,9 +5,9 @@ public class InputManager : MonoBehaviour
 {
     public delegate void OnInputModeEvent();
 
-    public delegate void WhenInputModeEvent(ElementController controller);
+    public delegate void WhenInputModeEvent(ElementController controller); // todo rename
 
-    public delegate void UpdateInputOnInputModeEvent();
+    public delegate void UpdateInputOnInputModeEvent(); // todo rename
 
     public enum InputMode
     {
@@ -146,6 +146,26 @@ public class InputManager : MonoBehaviour
             case InputMode.Drag:
                 if (UpdateInDrag != null) UpdateInDrag();
                 break;
+        }
+        if (currentMode == InputMode.Idle) return;
+        if ((Input.GetKeyUp(KeyCode.X) || Input.GetKeyUp(KeyCode.Delete)))
+        {
+            NodeDrawableBase.allDrawableBases.RemoveAll(x => x.ToString() == CurrentElement.ElementName);
+            ElectricalCircuit.Instance.realElements.Remove(CurrentElement);
+            Destroy(CurrentElement.transform.parent.gameObject);
+            SetMode(InputMode.Idle);
+            ElectricalCircuit.Instance.ApplyPhysics();
+            ElectricalCircuit.Instance.UpdatePointsOfConnections();
+        }
+        else if(Input.GetKeyUp(KeyCode.Plus) || Input.GetKeyUp(KeyCode.KeypadPlus))
+        {
+            CurrentElement.transform.parent.localScale *= 1.5f;
+            ElectricalCircuit.Instance.UpdatePointsOfConnections();
+        }
+        else if (Input.GetKeyUp(KeyCode.Minus) || Input.GetKeyUp(KeyCode.KeypadMinus))
+        {
+            CurrentElement.transform.parent.localScale /= 1.5f;
+            ElectricalCircuit.Instance.UpdatePointsOfConnections();
         }
     }
 

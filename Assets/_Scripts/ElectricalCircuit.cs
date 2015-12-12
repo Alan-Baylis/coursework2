@@ -46,7 +46,7 @@ public class ElectricalCircuit : MonoBehaviour
     public void UpdatePointsOfConnections()
     {
         var allControllers = realElements;
-        var elementsOfControllers = (from controller in allControllers select GetElementByController(controller));
+        var elementsOfControllers = (from controller in allControllers where GetElementByController(controller) != null select GetElementByController(controller));
         var pairsOfElements = (from element in elementsOfControllers
             where element.NextElement != null
             select new[] {element, element.NextElement});
@@ -117,7 +117,7 @@ public class ElectricalCircuit : MonoBehaviour
             Debug.LogError("Second element's core not found.");
             return;
         }
-        first.Connect(second);
+        first.Connect(first.NextElement != second ? second : null);
         ApplyPhysics();
         UpdatePointsOfConnections();
     }
@@ -184,7 +184,7 @@ public class ElectricalCircuit : MonoBehaviour
         ContextMenuManager.Instance.ContextMenuActive = false;
     }
 
-    public void UpdateLinesCount()
+    private void UpdateLinesCount()
     {
         foreach (var t in LineRenderers)
         {
